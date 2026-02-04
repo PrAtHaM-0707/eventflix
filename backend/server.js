@@ -43,6 +43,11 @@ app.use((req, res, next) => {
     next();
 });
 
+// Admin Panel Shortcut
+app.get('/admin', (req, res) => {
+    res.redirect('/Admin%20Panel/admin-login.html');
+});
+
 // API Routes
 app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 app.use('/api/auth', authRoutes);
