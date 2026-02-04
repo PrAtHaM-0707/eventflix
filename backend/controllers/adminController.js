@@ -4,21 +4,28 @@ import BookedSlot from '../models/BookedSlot.js';
 import { PACKAGES } from '../data/constants.js';
 import { generateToken } from '../utils/helpers.js';
 import { bookSlotInternal, freeSlotInternal } from './slotController.js';
-import { otpStore } from './authController.js'; // To get stats
+import { otpStore } from './authController.js';
 
 export const loginAdmin = (req, res) => {
     const { username, password } = req.body;
-    const admins = {
-        'admin': { password: 'admin123', name: 'Admin', role: 'super_admin' },
-        'manager': { password: 'manager123', name: 'Manager', role: 'manager' }
-    };
+    
+    const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
 
-    const admin = admins[username];
-    if (!admin || admin.password !== password) {
-        return res.status(401).json({ success: false, message: 'Invalid' });
+    if (username === adminUsername && password === adminPassword) {
+        const token = generateToken(username);
+        return res.json({ 
+            success: true, 
+            token, 
+            admin: { 
+                username: adminUsername, 
+                name: 'Administrator', 
+                role: 'super_admin' 
+            } 
+        });
     }
-    const token = generateToken(username);
-    res.json({ success: true, token, admin: { username, name: admin.name, role: admin.role } });
+
+    return res.status(401).json({ success: false, message: 'Invalid credentials' });
 };
 
 export const getAdminOrders = async (req, res) => {
@@ -50,28 +57,7 @@ export const getAdminSlots = async (req, res) => {
     }
 };
 
-export const updateOrderStatus = async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        const { status } = req.body;
-        const order = await Order.findOne({ orderId });
-        if (!order) return res.status(404).json({ success: false });
 
-        const oldStatus = order.status;
-        order.status = status;
-        order.updatedAt = new Date();
-        await order.save();
-
-        if (status === 'confirmed' && oldStatus !== 'confirmed') {
-            await bookSlotInternal(order.booking.date, order.booking.location, order.booking.slotId, order.booking.package);
-        } else if (status === 'cancelled' && oldStatus === 'confirmed') {
-            await freeSlotInternal(order.booking.date, order.booking.location, order.booking.slotId, order.booking.package);
-        }
-        res.json({ success: true, order });
-    } catch (e) {
-        res.status(500).json({ success: false });
-    }
-};
 
 export const getStats = async (req, res) => {
     try {
@@ -105,5 +91,34 @@ export const getStats = async (req, res) => {
         });
     } catch (e) {
         res.status(500).json({ success: false });
+    }
+};
+
+
+export const updateOrderStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { status } = req.body;
+        
+        const order = await Order.findOne({ orderId });
+        if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+        const oldStatus = order.status;
+        order.status = status;
+
+        if (status === 'confirmed' && oldStatus !== 'confirmed') {
+            order.paidAt = new Date();
+            // Import bookSlotInternal if not available in scope, but it is imported at top
+            await bookSlotInternal(order.booking.date, order.booking.location, order.booking.slotId, order.booking.package);
+        } else if (status === 'cancelled' && oldStatus !== 'cancelled') {
+            order.cancelledAt = new Date();
+            await freeSlotInternal(order.booking.date, order.booking.location, order.booking.slotId, order.booking.package);
+        }
+
+        await order.save();
+        res.json({ success: true, order });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ success: false, message: e.message });
     }
 };
