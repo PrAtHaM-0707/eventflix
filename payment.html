@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Payment - EventFlix</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Cashfree SDK -->
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+
+  <link rel="stylesheet" href="css/payment.css">
+</head>
+
+<body>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="big-spinner"></div>
+      <h4>Processing Payment</h4>
+      <p>Please wait, do not close this window...</p>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html">
+      <img src="img/Logo.png" alt="EventFlix">
+    </a>
+    <a href="package.html" class="back-btn">
+      ← Back to Packages
+    </a>
+  </nav>
+
+  <!-- Progress Steps -->
+  <div class="progress-container">
+    <div class="progress-steps">
+      <div class="step completed">
+        <span class="step-number">✓</span>
+        <span class="step-text">Package</span>
+      </div>
+      <div class="step-line completed"></div>
+      <div class="step completed">
+        <span class="step-number">✓</span>
+        <span class="step-text">Login</span>
+      </div>
+      <div class="step-line completed"></div>
+      <div class="step active">
+        <span class="step-number">3</span>
+        <span class="step-text">Payment</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="payment-container">
+    <!-- Error Box -->
+    <div class="error-box" id="errorBox">
+      <h5>⚠️ Error</h5>
+      <p id="errorMessage"></p>
+    </div>
+
+    <div class="row">
+      <!-- Left Column - Booking Summary -->
+      <div class="col-lg-7 mb-4">
+        <div class="card">
+          <div class="card-header">
+            📋 Booking Summary
+          </div>
+          <div class="card-body">
+            <!-- User Info -->
+            <div class="user-info">
+              <div class="user-avatar" id="userAvatar">?</div>
+              <div class="user-details">
+                <h5 id="userName">Loading...</h5>
+                <p id="userPhone">Loading...</p>
+              </div>
+            </div>
+
+            <!-- Booking Details -->
+            <div class="detail-row">
+              <span class="detail-label">📦 Package</span>
+              <span class="detail-value" id="packageName">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">📍 Location</span>
+              <span class="detail-value" id="location">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">📅 Date</span>
+              <span class="detail-value" id="bookingDate">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">🕐 Time Slot</span>
+              <span class="detail-value" id="timeSlot">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">💰 Package Price</span>
+              <span class="detail-value">₹<span id="basePrice">0</span></span>
+            </div>
+            <div class="detail-row" id="addonsRow" style="display: none;">
+              <span class="detail-label">✨ Add-ons</span>
+              <span class="detail-value text-success">+₹<span id="addonsTotal">0</span></span>
+            </div>
+            <div class="detail-row" id="discountRow" style="display: none;">
+              <span class="detail-label">🎁 Discount</span>
+              <span class="detail-value text-danger">-₹<span id="discountAmount">0</span></span>
+            </div>
+
+            <!-- Total -->
+            <div class="total-section">
+              <div class="total-row">
+                <span class="total-label">Total Amount</span>
+                <span class="total-amount">₹<span id="totalAmount">0</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Add-ons & Payment -->
+      <div class="col-lg-5">
+        <!-- Add-ons -->
+        <div class="card">
+          <div class="card-header">
+            ✨ Enhance Your Experience
+          </div>
+          <div class="card-body">
+            <div class="addon-item" data-price="299" data-name="Extra Decorations">
+              <div class="addon-info">
+                <h6>🎈 Extra Decorations</h6>
+                <p>Premium balloons & LED lights</p>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <span class="addon-price">+₹299</span>
+                <input type="checkbox" class="addon-checkbox" onchange="updateTotals()">
+              </div>
+            </div>
+
+            <div class="addon-item" data-price="399" data-name="Photography">
+              <div class="addon-info">
+                <h6>📸 Photography (15 mins)</h6>
+                <p>Professional photoshoot</p>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <span class="addon-price">+₹399</span>
+                <input type="checkbox" class="addon-checkbox" onchange="updateTotals()">
+              </div>
+            </div>
+
+            <div class="addon-item" data-price="199" data-name="Flower Bouquet">
+              <div class="addon-info">
+                <h6>💐 Flower Bouquet</h6>
+                <p>Fresh roses arrangement</p>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <span class="addon-price">+₹199</span>
+                <input type="checkbox" class="addon-checkbox" onchange="updateTotals()">
+              </div>
+            </div>
+
+            <div class="addon-item" data-price="249" data-name="Party Props">
+              <div class="addon-info">
+                <h6>🎭 Party Props Kit</h6>
+                <p>Fun photo props collection</p>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <span class="addon-price">+₹249</span>
+                <input type="checkbox" class="addon-checkbox" onchange="updateTotals()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coupon Code -->
+        <div class="card">
+          <div class="card-body">
+            <h6 class="mb-3">🎟️ Have a Coupon Code?</h6>
+            <div class="coupon-section">
+              <input type="text" id="couponCode" placeholder="Enter code">
+              <button onclick="applyCoupon()">Apply</button>
+            </div>
+            <div class="coupon-message" id="couponMessage"></div>
+            <small class="text-muted mt-2 d-block">
+              Try: FIRST100, EVENTFLIX10, WELCOME50
+            </small>
+          </div>
+        </div>
+
+        <!-- Pay Button -->
+        <button class="pay-btn" id="payButton" onclick="initiatePayment()">
+          🔒 Pay ₹<span id="payAmount">0</span> Securely
+        </button>
+
+        <!-- Security Info -->
+        <div class="security-info">
+          <p>🔐 100% Secure Payment</p>
+          <p class="small">Powered by Cashfree Payment Gateway</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // ============ CONFIGURATION ============
+    const API_URL = 'http://localhost:5000';
+
+    // ============ GLOBAL VARIABLES ============
+    let bookingData = {};
+    let userData = {};
+    let basePrice = 0;
+    let addonsTotal = 0;
+    let discount = 0;
+    let selectedAddons = [];
+
+    // Initialize Cashfree
+    const cashfree = Cashfree({
+      mode: "sandbox" // Change to "production" for live
+    });
+
+    // ============ INITIALIZE PAGE ============
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('🎬 Payment Page Loaded');
+
+      // Check if user is logged in
+      const token = localStorage.getItem('eventflix_token');
+      userData = JSON.parse(localStorage.getItem('eventflix_user') || '{}');
+
+      if (!token || !userData.phone) {
+        showError('Please login first');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
+        return;
+      }
+
+      // Get booking data
+      bookingData = JSON.parse(localStorage.getItem('eventflix_booking') || '{}');
+
+      if (!bookingData.package) {
+        showError('No booking found. Please select a package first.');
+        setTimeout(() => {
+          window.location.href = 'package.html';
+        }, 2000);
+        return;
+      }
+
+      // Display user info
+      displayUserInfo();
+
+      // Display booking details
+      displayBookingDetails();
+
+      // Setup addon click handlers
+      setupAddonHandlers();
+
+      // Initial total calculation
+      updateTotals();
+    });
+
+    // ============ DISPLAY FUNCTIONS ============
+    function displayUserInfo() {
+      const initials = userData.name ? userData.name.charAt(0).toUpperCase() : '?';
+      document.getElementById('userAvatar').textContent = initials;
+      document.getElementById('userName').textContent = userData.name || 'Guest';
+      document.getElementById('userPhone').textContent = '+91 ' + userData.phone;
+    }
+
+    function displayBookingDetails() {
+      document.getElementById('packageName').textContent = bookingData.package + ' Package';
+      document.getElementById('location').textContent = bookingData.location || '-';
+      document.getElementById('timeSlot').textContent = bookingData.slot || '-';
+
+      // Format date
+      if (bookingData.date) {
+        const date = new Date(bookingData.date);
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('bookingDate').textContent = date.toLocaleDateString('en-IN', options);
+      }
+
+      // Set base price
+      basePrice = parseInt(bookingData.price) || 0;
+      document.getElementById('basePrice').textContent = formatNumber(basePrice);
+    }
+
+    // ============ ADDON HANDLERS ============
+    function setupAddonHandlers() {
+      document.querySelectorAll('.addon-item').forEach(item => {
+        item.addEventListener('click', function (e) {
+          if (e.target.type !== 'checkbox') {
+            const checkbox = this.querySelector('.addon-checkbox');
+            checkbox.checked = !checkbox.checked;
+            updateTotals();
+          }
+        });
+      });
+    }
+
+    // ============ UPDATE TOTALS ============
+    function updateTotals() {
+      addonsTotal = 0;
+      selectedAddons = [];
+
+      document.querySelectorAll('.addon-item').forEach(item => {
+        const checkbox = item.querySelector('.addon-checkbox');
+
+        if (checkbox.checked) {
+          item.classList.add('selected');
+          const price = parseInt(item.dataset.price) || 0;
+          const name = item.dataset.name;
+          addonsTotal += price;
+          selectedAddons.push({ name, price });
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+
+      // Update display
+      if (addonsTotal > 0) {
+        document.getElementById('addonsRow').style.display = 'flex';
+        document.getElementById('addonsTotal').textContent = formatNumber(addonsTotal);
+      } else {
+        document.getElementById('addonsRow').style.display = 'none';
+      }
+
+      // Calculate total
+      const total = basePrice + addonsTotal - discount;
+      document.getElementById('totalAmount').textContent = formatNumber(total);
+      document.getElementById('payAmount').textContent = formatNumber(total);
+
+      // Store addons
+      localStorage.setItem('eventflix_addons', JSON.stringify(selectedAddons));
+    }
+
+    // ============ COUPON SYSTEM ============
+    function applyCoupon() {
+      const code = document.getElementById('couponCode').value.trim().toUpperCase();
+      const messageEl = document.getElementById('couponMessage');
+
+      if (!code) {
+        messageEl.textContent = 'Please enter a coupon code';
+        messageEl.className = 'coupon-message error';
+        return;
+      }
+
+      // Available coupons
+      const coupons = {
+        'FIRST100': { type: 'flat', value: 100 },
+        'EVENTFLIX10': { type: 'percent', value: 10 },
+        'WELCOME50': { type: 'flat', value: 50 },
+        'SPECIAL20': { type: 'percent', value: 20 }
+      };
+
+      if (coupons[code]) {
+        const coupon = coupons[code];
+
+        if (coupon.type === 'flat') {
+          discount = coupon.value;
+        } else {
+          discount = Math.round(basePrice * coupon.value / 100);
+        }
+
+        document.getElementById('discountRow').style.display = 'flex';
+        document.getElementById('discountAmount').textContent = formatNumber(discount);
+
+        messageEl.textContent = `✓ Coupon applied! You save ₹${formatNumber(discount)}`;
+        messageEl.className = 'coupon-message success';
+
+        updateTotals();
+      } else {
+        discount = 0;
+        document.getElementById('discountRow').style.display = 'none';
+        messageEl.textContent = '✕ Invalid coupon code';
+        messageEl.className = 'coupon-message error';
+        updateTotals();
+      }
+    }
+
+    // ============ PAYMENT INTEGRATION ============
+    async function initiatePayment() {
+      const total = basePrice + addonsTotal - discount;
+
+      if (total <= 0) {
+        showError('Invalid amount');
+        return;
+      }
+
+      const payBtn = document.getElementById('payButton');
+      payBtn.disabled = true;
+      payBtn.innerHTML = '<span class="spinner"></span> Processing...';
+
+      showLoading(true);
+      hideError();
+
+      try {
+        console.log('📤 Creating order...');
+        console.log('   Amount:', total);
+        console.log('   User:', userData.name, userData.phone);
+
+        // Create order via backend
+        const response = await fetch(`${API_URL}/create-order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            amount: total,
+            name: userData.name || 'Guest',
+            email: userData.email || `${userData.phone}@eventflix.temp`,
+            phone: userData.phone,
+            booking: {
+              package: bookingData.package,
+              location: bookingData.location,
+              date: bookingData.date,
+              slot: bookingData.slot,
+              basePrice: basePrice,
+              addons: selectedAddons,
+              discount: discount,
+              totalAmount: total
+            }
+          })
+        });
+
+        const data = await response.json();
+        console.log('📥 Response:', data);
+
+        if (data.success && data.payment_session_id) {
+          console.log('✅ Order created:', data.order_id);
+          console.log('🔗 Opening Cashfree checkout...');
+
+          // Store order ID for success page
+          localStorage.setItem('eventflix_pending_order', data.order_id);
+
+          // Open Cashfree checkout
+          const checkoutOptions = {
+            paymentSessionId: data.payment_session_id,
+            redirectTarget: "_self"
+          };
+
+          cashfree.checkout(checkoutOptions).then((result) => {
+            if (result.error) {
+              console.error('❌ Checkout error:', result.error);
+              showError('Payment failed: ' + result.error.message);
+              resetPayButton();
+            }
+            if (result.redirect) {
+              console.log('↪️ Redirecting to payment gateway...');
+            }
+            if (result.paymentDetails) {
+              console.log('💳 Payment details:', result.paymentDetails);
+            }
+          }).catch((error) => {
+            console.error('❌ Cashfree error:', error);
+            showError('Payment initialization failed');
+            resetPayButton();
+          });
+
+        } else {
+          throw new Error(data.message || data.error || 'Failed to create order');
+        }
+
+      } catch (error) {
+        console.error('❌ Payment Error:', error);
+        showError('Payment failed: ' + error.message);
+        resetPayButton();
+      }
+    }
+
+    // ============ UI HELPERS ============
+    function showLoading(show) {
+      document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+    }
+
+    function showError(message) {
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorBox').style.display = 'block';
+      showLoading(false);
+    }
+
+    function hideError() {
+      document.getElementById('errorBox').style.display = 'none';
+    }
+
+    function resetPayButton() {
+      const payBtn = document.getElementById('payButton');
+      payBtn.disabled = false;
+      const total = basePrice + addonsTotal - discount;
+      payBtn.innerHTML = `🔒 Pay ₹${formatNumber(total)} Securely`;
+      showLoading(false);
+    }
+
+    function formatNumber(num) {
+      return new Intl.NumberFormat('en-IN').format(num);
+    }
+
+    // ============ KEYBOARD SHORTCUTS ============
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && document.activeElement.id === 'couponCode') {
+        applyCoupon();
+      }
+    });
+  </script>
+
+</body>
+
+</html>

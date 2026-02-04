@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventFlix - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="login-header">
+            <img src="img/Logo.png" alt="EventFlix">
+            <h4>Login to Continue</h4>
+            <p class="mb-0">Verify your phone number</p>
+        </div>
+
+        <div class="login-body">
+            <!-- Booking Summary -->
+            <div class="booking-summary" id="bookingSummary">
+                <h6>📋 Your Booking</h6>
+                <div id="summaryContent"></div>
+            </div>
+
+            <!-- Phone Input Form -->
+            <form id="phoneForm">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Mobile Number</label>
+                    <div class="phone-input-group">
+                        <input type="text" class="form-control country-code" value="+91" readonly>
+                        <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter 10 digit number"
+                            maxlength="10" pattern="[0-9]{10}" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Your Name</label>
+                    <input type="text" class="form-control" id="userName" placeholder="Enter your name" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="sendOtpBtn">
+                    Continue to Payment
+                </button>
+            </form>
+
+            <!-- OTP Verification Form -->
+            <form id="otpForm" class="hidden">
+                <div class="mb-3 text-center">
+                    <label class="form-label fw-bold">Enter OTP sent to <span id="displayPhone"></span></label>
+                    <div class="otp-inputs">
+                        <input type="text" class="otp-input" maxlength="1" data-index="0">
+                        <input type="text" class="otp-input" maxlength="1" data-index="1">
+                        <input type="text" class="otp-input" maxlength="1" data-index="2">
+                        <input type="text" class="otp-input" maxlength="1" data-index="3">
+                        <input type="text" class="otp-input" maxlength="1" data-index="4">
+                        <input type="text" class="otp-input" maxlength="1" data-index="5">
+                    </div>
+                </div>
+
+                <div class="text-center mb-3">
+                    <span class="timer" id="timer">Resend OTP in <span id="countdown">30</span>s</span>
+                    <button type="button" class="resend-btn hidden" id="resendBtn" onclick="resendOTP()">
+                        Resend OTP
+                    </button>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="verifyBtn">
+                    Verify & Continue
+                </button>
+
+                <button type="button" class="back-link" onclick="showPhoneForm()">
+                    ← Change Phone Number
+                </button>
+            </form>
+
+            <a href="package.html" class="back-link">← Back to Packages</a>
+        </div>
+    </div>
+
+    <script>
+        // ============ VARIABLES ============
+        let phoneNumber = '';
+        let userName = '';
+        let otpTimer = null;
+        let countdown = 30;
+
+        // ============ INITIALIZE ============
+        document.addEventListener('DOMContentLoaded', function () {
+            // Load booking summary
+            const booking = JSON.parse(localStorage.getItem('eventflix_booking') || '{}');
+
+            if (booking.package) {
+                document.getElementById('summaryContent').innerHTML = `
+                    <p class="mb-1"><strong>Package:</strong> ${booking.package}</p>
+                    <p class="mb-1"><strong>Date:</strong> ${new Date(booking.date).toLocaleDateString('en-IN')}</p>
+                    <p class="mb-1"><strong>Time:</strong> ${booking.slot}</p>
+                    <p class="mb-1"><strong>Location:</strong> ${booking.location}</p>
+                    <p class="mb-0"><strong>Amount:</strong> ₹${booking.price}</p>
+                `;
+            } else {
+                document.getElementById('bookingSummary').classList.add('hidden');
+            }
+
+            // Check if already logged in
+            if (localStorage.getItem('eventflix_token')) {
+                window.location.href = 'payment.html';
+            }
+
+            // Setup OTP inputs auto-focus
+            setupOTPInputs();
+        });
+
+        // ============ PHONE FORM SUBMIT ============
+        document.getElementById('phoneForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            phoneNumber = document.getElementById('phoneNumber').value;
+            userName = document.getElementById('userName').value;
+
+            if (phoneNumber.length !== 10) {
+                alert('Please enter a valid 10-digit phone number');
+                return;
+            }
+
+            const btn = document.getElementById('sendOtpBtn');
+            btn.innerHTML = '<span class="loading"></span> Processing...';
+            btn.disabled = true;
+
+            try {
+                // Direct Login (No OTP)
+                const response = await fetch('http://localhost:5000/api/auth/login-direct', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phoneNumber, name: userName })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('eventflix_token', data.token);
+                    localStorage.setItem('eventflix_user', JSON.stringify(data.user));
+                    window.location.href = 'payment.html';
+                } else {
+                    alert(data.message || 'Login failed');
+                    btn.innerHTML = 'Continue to Payment';
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Login Error:', error);
+                alert('Login failed. Please try again.');
+                btn.innerHTML = 'Continue to Payment';
+                btn.disabled = false;
+            }
+        });
+
+        // ============ SHOW OTP FORM (DISABLED) ============
+        function showOTPForm() {
+            // Disabled for now
+            // document.getElementById('phoneForm').classList.add('hidden');
+            // document.getElementById('otpForm').classList.remove('hidden');
+            // ...
+        }
+
+        // ============ SHOW PHONE FORM ============
+        function showPhoneForm() {
+            document.getElementById('otpForm').classList.add('hidden');
+            document.getElementById('phoneForm').classList.remove('hidden');
+            document.getElementById('sendOtpBtn').innerHTML = 'Send OTP';
+            document.getElementById('sendOtpBtn').disabled = false;
+            clearInterval(otpTimer);
+        }
+
+        // ============ OTP FORM SUBMIT ============
+        document.getElementById('otpForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const otpInputs = document.querySelectorAll('.otp-input');
+            let otp = '';
+            otpInputs.forEach(input => otp += input.value);
+
+            if (otp.length !== 6) {
+                alert('Please enter complete OTP');
+                return;
+            }
+
+            const btn = document.getElementById('verifyBtn');
+            btn.innerHTML = '<span class="loading"></span> Verifying...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phoneNumber, otp: otp, name: userName })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store token and user info
+                    localStorage.setItem('eventflix_token', data.token);
+                    localStorage.setItem('eventflix_user', JSON.stringify(data.user));
+
+                    // Redirect to payment
+                    window.location.href = 'payment.html';
+                } else {
+                    alert(data.message || 'Invalid OTP');
+                    btn.innerHTML = 'Verify & Continue';
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                // Demo mode - accept any 6-digit OTP
+                console.log('Demo mode: Accepting OTP');
+
+                const demoUser = {
+                    id: 'demo_' + Date.now(),
+                    phone: phoneNumber,
+                    name: userName
+                };
+
+                localStorage.setItem('eventflix_token', 'demo_token_' + Date.now());
+                localStorage.setItem('eventflix_user', JSON.stringify(demoUser));
+
+                window.location.href = 'payment.html';
+            }
+        });
+
+        // ============ SETUP OTP INPUTS ============
+        function setupOTPInputs() {
+            const inputs = document.querySelectorAll('.otp-input');
+
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', function () {
+                    if (this.value.length === 1 && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+
+                input.addEventListener('paste', function (e) {
+                    e.preventDefault();
+                    const paste = (e.clipboardData || window.clipboardData).getData('text');
+                    const digits = paste.replace(/\D/g, '').slice(0, 6);
+
+                    digits.split('').forEach((digit, i) => {
+                        if (inputs[i]) inputs[i].value = digit;
+                    });
+                });
+            });
+        }
+
+        // ============ COUNTDOWN TIMER ============
+        function startCountdown() {
+            countdown = 30;
+            document.getElementById('timer').classList.remove('hidden');
+            document.getElementById('resendBtn').classList.add('hidden');
+
+            otpTimer = setInterval(() => {
+                countdown--;
+                document.getElementById('countdown').textContent = countdown;
+
+                if (countdown <= 0) {
+                    clearInterval(otpTimer);
+                    document.getElementById('timer').classList.add('hidden');
+                    document.getElementById('resendBtn').classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        // ============ RESEND OTP ============
+        async function resendOTP() {
+            try {
+                await fetch('http://localhost:5000/api/auth/send-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phoneNumber, name: userName })
+                });
+            } catch (error) {
+                console.log('Demo mode: OTP resent');
+            }
+
+            startCountdown();
+            alert('OTP sent again!');
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Booking Details - EventFlix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="img/Logo.png" type="image/png">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background:#f6f7fb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    }
+    .container-box {
+      max-width: 800px;
+      margin: 60px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .header {
+      padding: 20px 30px;
+      border-bottom: 1px solid #eee;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .header img {
+      height: 36px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .summary-box {
+      background:#f9fafc;
+      border-radius:10px;
+      padding:20px;
+      margin-bottom:25px;
+    }
+    .summary-row {
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .summary-row span:first-child {
+      color:#666;
+    }
+    .summary-row span:last-child {
+      font-weight:600;
+    }
+    .form-control {
+      height:48px;
+      border-radius:8px;
+    }
+    .btn-main {
+      height:50px;
+      border-radius:10px;
+      font-weight:600;
+      width:100%;
+    }
+    .otp-box {
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      margin:20px 0;
+    }
+    .otp-box input {
+      width:45px;
+      height:50px;
+      text-align:center;
+      font-size:18px;
+      border-radius:8px;
+      border:1px solid #ccc;
+    }
+    .hidden {
+      display:none;
+    }
+    .text-link {
+      color:#6c63ff;
+      cursor:pointer;
+      font-weight:500;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container-box">
+  <div class="header">
+    <img src="img/Logo.png" alt="EventFlix">
+    <a href="package.html" class="text-decoration-none">← Back</a>
+  </div>
+
+  <div class="content">
+
+    <!-- BOOKING SUMMARY -->
+    <div class="summary-box">
+      <h5 class="mb-3">📋 Booking Summary</h5>
+
+      <div class="summary-row">
+        <span>Package</span>
+        <span id="sumPackage">-</span>
+      </div>
+      <div class="summary-row">
+        <span>Location</span>
+        <span id="sumLocation">-</span>
+      </div>
+      <div class="summary-row">
+        <span>Date</span>
+        <span id="sumDate">-</span>
+      </div>
+      <div class="summary-row">
+        <span>Time Slot</span>
+        <span id="sumSlot">-</span>
+      </div>
+      <hr>
+      <div class="summary-row">
+        <span>Total Amount</span>
+        <span>₹<span id="sumPrice">0</span></span>
+      </div>
+    </div>
+
+    <!-- STEP 1: USER DETAILS -->
+    <div id="detailsStep">
+      <h5 class="mb-3">👤 Your Details</h5>
+
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" id="userName" class="form-control" placeholder="Enter your name">
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Mobile Number</label>
+        <input type="text" id="userPhone" class="form-control" placeholder="10 digit number" maxlength="10">
+      </div>
+
+      <button class="btn btn-dark btn-main" onclick="sendOTP()">Send OTP →</button>
+    </div>
+
+    <!-- STEP 2: OTP -->
+    <div id="otpStep" class="hidden text-center">
+      <h5 class="mb-2">📱 Verify OTP</h5>
+      <p>OTP sent to <strong>+91 <span id="otpPhone"></span></strong></p>
+
+      <div class="otp-box">
+        <input maxlength="1">
+        <input maxlength="1">
+        <input maxlength="1">
+        <input maxlength="1">
+        <input maxlength="1">
+        <input maxlength="1">
+      </div>
+
+      <button class="btn btn-dark btn-main mb-3" onclick="verifyOTP()">Verify & Continue →</button>
+      <div class="text-link" onclick="goBack()">← Change Number</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API_URL = 'http://localhost:5000';
+let booking = {};
+let tempPhone = '';
+let tempName = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+  booking = JSON.parse(localStorage.getItem('eventflix_booking') || '{}');
+
+  if (!booking.package) {
+    window.location.href = 'package.html';
+    return;
+  }
+
+  document.getElementById('sumPackage').textContent = booking.package;
+  document.getElementById('sumLocation').textContent = booking.location;
+  document.getElementById('sumSlot').textContent = booking.slotLabel || booking.slot;
+  document.getElementById('sumPrice').textContent = booking.price;
+
+  if (booking.date) {
+    document.getElementById('sumDate').textContent =
+      new Date(booking.date).toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+});
+
+// ---------------- OTP FLOW ----------------
+
+async function sendOTP() {
+  const name = document.getElementById('userName').value.trim();
+  const phone = document.getElementById('userPhone').value.trim();
+
+  if (!name || phone.length !== 10) {
+    alert('Enter valid name and mobile number');
+    return;
+  }
+
+  tempPhone = phone;
+  tempName = name;
+
+  const res = await fetch(`${API_URL}/api/auth/send-otp`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ phone, name })
+  });
+
+  const data = await res.json();
+  if (!data.success) {
+    alert(data.message || 'OTP failed');
+    return;
+  }
+
+  document.getElementById('otpPhone').textContent = phone;
+  document.getElementById('detailsStep').classList.add('hidden');
+  document.getElementById('otpStep').classList.remove('hidden');
+}
+
+async function verifyOTP() {
+  const inputs = document.querySelectorAll('.otp-box input');
+  let otp = '';
+  inputs.forEach(i => otp += i.value);
+
+  if (otp.length !== 6) {
+    alert('Enter complete OTP');
+    return;
+  }
+
+  const res = await fetch(`${API_URL}/api/auth/verify-otp`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ phone: tempPhone, otp, name: tempName })
+  });
+
+  const data = await res.json();
+  if (!data.success) {
+    alert(data.message || 'OTP invalid');
+    return;
+  }
+
+  localStorage.setItem('eventflix_token', data.token);
+  localStorage.setItem('eventflix_user', JSON.stringify(data.user));
+
+  window.location.href = 'payment.html';
+}
+
+function goBack() {
+  document.getElementById('otpStep').classList.add('hidden');
+  document.getElementById('detailsStep').classList.remove('hidden');
+}
+</script>
+
+</body>
+</html>

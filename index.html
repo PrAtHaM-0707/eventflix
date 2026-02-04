@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Flix - Private Theatres for Celebrations & Surprises</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="shortcut icon" href="./img/Logo.png" type="image/png">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="./img/Logo.png" alt="Event Flix">
+            </div>
+            <ul class="deco">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Our Services</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="my-bookings.html">My Bookings</a></li>
+            </ul>
+            <div class="book">
+                <a href="#book" class="book-btn">Book Now</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" id="home">
+            <h1 class="hero-heading">Gujarat's Best Private Theatre Venue for Celebrations</h1>
+            <h2 class="hero-heading">Book Your Perfect Celebration: Birthdays, Anniversaries, Date Nights & More!</h2>
+
+            <form class="form-card" id="book">
+                <p>Gujarat</p>
+
+                <div class="input-group">
+                    <label for="location" class="input-label">LOCATION</label>
+                    <select id="location" class="input-field" required>
+                        <option value="">Choose a location</option>
+                        <option value="Surat">Surat</option>
+                        <option value="Ahmedabad">Ahmedabad</option>
+                        <option value="Rajkot">Rajkot</option>
+                        <option value="Junagadh">Junagadh</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="date" class="input-label">DATE</label>
+                    <input type="date" name="date" id="date" class="input-field" required>
+                </div>
+
+                <button class="book-btn" type="button" onclick="goToPackages()">Book Now</button>
+            </form>
+        </section>
+
+        <section class="party-cards">
+            <div class="party-card">
+                <div class="svg-partycard">
+                    <img src="https://www.svgrepo.com/show/501917/cake.svg" alt="Birthday Cake">
+                </div>
+                <div class="text-partycard">
+                    <h3>Birthday Party</h3>
+                    <p>Host an unforgettable birthday celebration with our private theatre experience. Enjoy a
+                        personalised movie screening with friends and family in a cozy, exclusive setting</p>
+                </div>
+            </div>
+            <div class="party-card">
+                <div class="svg-partycard">
+                    <img src="https://www.svgrepo.com/show/501906/ring.svg" alt="Wedding Ring">
+                </div>
+                <div class="text-partycard">
+                    <h3>Anniversary</h3>
+                    <p>Celebrate your special milestone with a romantic and intimate private theatre experience. Create
+                        lasting memories with a customised movie night just for the two of you.</p>
+                </div>
+            </div>
+            <div class="party-card">
+                <div class="svg-partycard">
+                    <img src="https://www.svgrepo.com/show/434191/party-popper.svg" alt="Party">
+                </div>
+                <div class="text-partycard">
+                    <h3>Party & Events</h3>
+                    <p>From reunions and farewells to casual get-togethers, our private theatres offer a unique and
+                        exclusive venue for any special occasion with a one-of-a-kind cinematic experience</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="why-container">
+            <h2 class="why-title">Why Celebrate at Event Flix?</h2>
+            <p class="why-subtitle">Unforgettable Surprises with Stunning Decorations!</p>
+
+            <div class="why-desktop">
+                <div class="why-left">
+                    <ul class="why-list">
+                        <li><strong>Unique & Memorable Experiences</strong> – We specialize in creating unforgettable
+                            celebrations tailored to your needs.</li>
+                        <li><strong>Stunning Decorations</strong> – From elegant balloon setups to themed décor, we
+                            bring your vision to life.</li>
+                        <li><strong>Premium Quality & Attention to Detail</strong> – Every event is crafted with
+                            precision and top-quality materials.</li>
+                        <li><strong>Trusted by Thousands</strong> – Our happy customers love our seamless service and
+                            creative designs.</li>
+                        <li><strong>Hassle-Free Booking</strong> – Easy and quick reservations for birthdays,
+                            anniversaries, proposals, and more!</li>
+                    </ul>
+                    <a href="#book" class="book-btn-why">Book Now</a>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider">
+                        <button class="arrow arrow-left">❮</button>
+                        <div class="slides">
+                            <div class="slide"><img src="./img/Slidebar-Why (1).jpeg" alt="Slide 1"></div>
+                            <div class="slide"><img src="./img/downloadSlidebar-Why (2).jpeg" alt="Slide 2"></div>
+                            <div class="slide"><img src="./img/Slidebar-Why (3).jpeg" alt="Slide 3"></div>
+                            <div class="slide"><img src="./img/Slidebar-Why (4).jpg" alt="Slide 4"></div>
+                            <div class="slide"><img src="./img/Slidebar-Why (5).jpg" alt="Slide 5"></div>
+                        </div>
+                        <button class="arrow arrow-right">❯</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="why-mobile">
+                <div class="slider">
+                    <div class="slides">
+                        <img src="./img/Slidebar-Why (1).jpeg" alt="Slide 1">
+                        <img src="./img/downloadSlidebar-Why (2).jpeg" alt="Slide 2">
+                        <img src="./img/Slidebar-Why (3).jpeg" alt="Slide 3">
+                    </div>
+                </div>
+                <ul class="why-list">
+                    <li><strong>Unique & Memorable Experiences</strong></li>
+                    <li><strong>Stunning Decorations</strong></li>
+                    <li><strong>Premium Quality</strong></li>
+                    <li><strong>Trusted by Thousands</strong></li>
+                    <li><strong>Hassle-Free Booking</strong></li>
+                </ul>
+                <a href="#book" class="book-btn">Book Now</a>
+            </div>
+        </section>
+
+        <section class="private-theater">
+            <h2>How does Private Theater Celebration work?</h2>
+            <div class="HowItWorks_description__Mfbax">
+                Private Theatre celebration is a very new concept pioneered by Event Flix. Guests can book private
+                theaters for celebrating birthdays, anniversaries, date night, bride to be, etc and enjoy watching their
+                favorite movies, shows, photos and videos on the big screen. Guests can also enjoy delicious food and
+                beverages, and add other services like Cakes, Gifts, Photoshoot, etc. Event Flix private theaters
+                make celebrations easy, affordable, fun and memorable.
+            </div>
+            <a href="#book" class="book-btn">Book Now</a>
+        </section>
+
+        <section class="reviews">
+            <h2>More than 100 reviews on Google with 4.9
+                <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="#fbbc04">
+                    <path d="M63.893,24.277c-0.238-0.711-0.854-1.229-1.595-1.343l-19.674-3.006L33.809,1.15
+                        C33.479,0.448,32.773,0,31.998,0s-1.48,0.448-1.811,1.15l-8.815,18.778L1.698,22.935
+                        c-0.741,0.113-1.356,0.632-1.595,1.343c-0.238,0.71-0.059,1.494,0.465,2.031l14.294,14.657
+                        L11.484,61.67c-0.124,0.756,0.195,1.517,0.822,1.957c0.344,0.243,0.747,0.366,1.151,0.366
+                        c0.332,0,0.666-0.084,0.968-0.25l17.572-9.719l17.572,9.719c0.302,0.166,0.636,0.25,0.968,0.25
+                        c0.404,0,0.808-0.123,1.151-0.366c0.627-0.44,0.946-1.201,0.822-1.957l-3.378-20.704l14.294-14.657
+                        C63.951,25.771,64.131,24.987,63.893,24.277z"></path>
+                </svg>
+                rating!
+            </h2>
+
+            <div class="review-slider">
+                <div class="review-track">
+                    <div class="review">
+                        <div class="in-review-1">
+                            <div class="in-review-1-logo">
+                                <img src="https://lh3.googleusercontent.com/a/ACg8ocLSEuDFWZCad2_I3XY1R2YE5q9Af89zTEk7kz1MK7_GokOC7F17=w54-h54-p-rp-mo-br100"
+                                    alt="">
+                            </div>
+                            <div class="in-review-1-txt">
+                                <p>Khodidas Ratanpara</p>
+                                <p>1 week ago</p>
+                            </div>
+                        </div>
+                        <div class="in-review-2">
+                            <p>Great place for celebration and enjoy movie like it 😀</p>
+                        </div>
+                        <div class="in-review-3">
+                            <div class="rating">⭐⭐⭐⭐⭐</div>
+                            <div class="google-logo">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review">
+                        <div class="in-review-1">
+                            <div class="in-review-1-logo">
+                                <img src="https://lh3.googleusercontent.com/a/ACg8ocKeYdlz1KLDdFutDf8JL2Vka-EV6LDWs-lUDBsCeXhbCvaNPA=w54-h54-p-rp-mo-ba2-br100"
+                                    alt="">
+                            </div>
+                            <div class="in-review-1-txt">
+                                <p>Tricha Chadha</p>
+                                <p>1 year ago</p>
+                            </div>
+                        </div>
+                        <div class="in-review-2">
+                            <p>The experience here is heavenly guys speaking from my personal experience here! They have
+                                unmatched hospitality. Do book your celebrations here ❣️</p>
+                        </div>
+                        <div class="in-review-3">
+                            <div class="rating">⭐⭐⭐⭐⭐</div>
+                            <div class="google-logo">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review">
+                        <div class="in-review-1">
+                            <div class="in-review-1-logo">
+                                <img src="https://lh3.googleusercontent.com/a/ACg8ocJBvzwzTJJxzBO5WBO1IzWZohXsyRJvGFfM-l7BgO1RLqg1pg=w54-h54-p-rp-mo-br100"
+                                    alt="">
+                            </div>
+                            <div class="in-review-1-txt">
+                                <p>Raju Alam</p>
+                                <p>5 months ago</p>
+                            </div>
+                        </div>
+                        <div class="in-review-2">
+                            <p>Event Flix team is very supportive. Last moment booking but they arranged everything
+                                perfectly. Thank you so much!</p>
+                        </div>
+                        <div class="in-review-3">
+                            <div class="rating">⭐⭐⭐⭐⭐</div>
+                            <div class="google-logo">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review">
+                        <div class="in-review-1">
+                            <div class="in-review-1-logo">
+                                <img src="https://lh3.googleusercontent.com/a-/ALV-UjU06ySxAcHzbbujPTwhoYQ_AIY4ZdARx9AP3ZemsKiFZnUUw2Y=w54-h54-p-rp-mo-br100"
+                                    alt="">
+                            </div>
+                            <div class="in-review-1-txt">
+                                <p>Sakshi Aparnathi</p>
+                                <p>5 months ago</p>
+                            </div>
+                        </div>
+                        <div class="in-review-2">
+                            <p>I felt very good for the service and staff there. I wanted you to visit it too.</p>
+                        </div>
+                        <div class="in-review-3">
+                            <div class="rating">⭐⭐⭐⭐⭐</div>
+                            <div class="google-logo">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review">
+                        <div class="in-review-1">
+                            <div class="in-review-1-logo">
+                                <img src="https://lh3.googleusercontent.com/a/ACg8ocI2csSdyAn3yITcbA21WqR9EJRcvOd5Ef7QyKE6HySAoJ6PbA=w54-h54-p-rp-mo-br100"
+                                    alt="">
+                            </div>
+                            <div class="in-review-1-txt">
+                                <p>Shital Umaretiya</p>
+                                <p>2 months ago</p>
+                            </div>
+                        </div>
+                        <div class="in-review-2">
+                            <p>Amazing place for birthday, really liked it. Thank you for saving my valuable memory 🎉
+                            </p>
+                        </div>
+                        <div class="in-review-3">
+                            <div class="rating">⭐⭐⭐⭐⭐</div>
+                            <div class="google-logo">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="faq-section">
+            <div class="faq-container">
+                <h2>Frequently Asked Questions</h2>
+
+                <div class="faq-item">
+                    <div class="faq-question">Can we watch movies or shows at the cafe? Can we play our own videos?
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes! You can watch movies, shows, and play your own videos without any restrictions. All
+                            forms of playback, including OTT accounts, phones, laptops, and pendrives, are fully
+                            supported.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">What is your refund policy?</div>
+                    <div class="faq-answer">
+                        <p>Yes! We offer a full and easy refund for your advance payment whenever you need it.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Are washrooms available at all branches?</div>
+                    <div class="faq-answer">
+                        <p>Yes, all our branches have clean, well-maintained, and easily accessible washrooms for your
+                            comfort.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Are children chargeable?</div>
+                    <div class="faq-answer">
+                        <p>Kids above 10 years: Standard charges apply.</p>
+                        <p>Kids between 3–10 years: Half charges.</p>
+                        <p>Kids below 3 years: Completely free!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <h2>Our Services</h2>
+
+            <div class="slider-container">
+                <button class="nav-btn prev-btn">❮</button>
+
+                <div class="services-slidebar">
+                    <div class="service">
+                        <img src="https://tse1.mm.bing.net/th/id/OIP.rW3GzDA4YgrpmL01TiW_IgHaFj?rs=1&pid=ImgDetMain"
+                            alt="Private Movie Screening">
+                        <p>Private Movie Screening</p>
+                    </div>
+                    <div class="service">
+                        <img src="https://www.thespruce.com/thmb/H8fDbKB6N9cLgtU8J2VjISNVvOk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/living-room-decor-ideas-5442837-hero-8b6e540e13f9457a84fe9f9e26ea2e5c.jpg"
+                            alt="Decoration">
+                        <p>Decoration</p>
+                    </div>
+                    <div class="service">
+                        <img src="https://www.tastingtable.com/img/gallery/25-most-popular-snacks-in-america-ranked-worst-to-best/intro-1645492743.jpg"
+                            alt="Snacks and Beverages">
+                        <p>Snacks and Beverages</p>
+                    </div>
+                    <div class="service">
+                        <img src="https://www.kaanbakery.com/cdn/shop/files/extra-chocolate-cake.jpg?v=1749063966&width=3200"
+                            alt="Cakes">
+                        <p>Cakes</p>
+                    </div>
+                    <div class="service">
+                        <img src="https://i.etsystatic.com/40024655/r/il/7fb47b/4805216303/il_1080xN.4805216303_2te7.jpg"
+                            alt="Bouquet and other Gifts">
+                        <p>Bouquet and other Gifts</p>
+                    </div>
+                    <div class="service">
+                        <img src="https://tse1.mm.bing.net/th/id/OIP.sJhPUDeoU0Z-N1sykhG8eQHaEK?rs=1&pid=ImgDetMain"
+                            alt="Fog Entry">
+                        <p>Fog Entry</p>
+                    </div>
+                    <div class="service">
+                        <img src="https://tse1.mm.bing.net/th/id/OIP.nVdyU-_Ucua7NmXMBikAXAHaJ4?rs=1&pid=ImgDetMain"
+                            alt="Photoshoot">
+                        <p>Photoshoot</p>
+                    </div>
+                </div>
+
+                <button class="nav-btn next-btn">❯</button>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="gallery" class="gallery-section">
+            <div class="container">
+                <h1 style="text-align: center;">Gallery</h1>
+
+                <div class="gallery-wrapper">
+                    <div class="gallery-card">
+                        <img src="https://image2url.com/images/1765151724069-5edd4181-8320-476a-baf3-d9d76ea1a4cf.jpg"
+                            alt="Event Flix Gallery" loading="lazy">
+                    </div>
+                    <div class="gallery-card">
+                        <img src="https://image2url.com/images/1765151564703-93439b65-c83d-4437-bc70-38cc7d37fe4f.jpg"
+                            alt="Event Flix Gallery" loading="lazy">
+                    </div>
+                    <div class="gallery-card">
+                        <img src="https://image2url.com/images/1765151601033-45830104-046e-46da-8a23-b8ab2aa9273a.jpg"
+                            alt="Event Flix Gallery" loading="lazy">
+                    </div>
+                    <div class="gallery-card">
+                        <img src="https://image2url.com/images/1765151626556-ced90d13-5090-476f-be5a-275d4e0ad7d2.jpg"
+                            alt="Event Flix Gallery" loading="lazy">
+                    </div>
+                    <div class="gallery-card">
+                        <img src="https://image2url.com/images/1765151647646-be7fd106-935d-41d7-993e-caf611f163a6.jpg"
+                            alt="Event Flix Gallery" loading="lazy">
+                    </div>
+                    <div class="gallery-card">
+                        <img src="https://image2url.com/images/1765151669157-d28a21bb-5544-4cad-96e1-9174e2c0f54d.jpg"
+                            alt="Event Flix Gallery" loading="lazy">
+                    </div>
+                    <div class="gallery-card">
+                        <img src="https://image2url.com/images/1765151687385-eef50ca0-6b29-476d-9fa5-b330497adbca.jpg"
+                            alt="Event Flix Gallery" loading="lazy">
+                    </div>
+                    <div class="gallery-card">
+                        <img src="https://image2url.com/images/1765151703936-d101defb-584d-4235-82c4-315d2aa3480a.jpg"
+                            alt="Event Flix Gallery" loading="lazy">
+                    </div>
+                </div>
+            </div>
+
+            <div class="gallery-btn">
+                <a href="#book" class="book-btn">Book Now</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="foot-top">
+            <div class="logo">
+                <img src="./img/Logo.png" id="foot-logo" alt="Event Flix">
+            </div>
+            <ul>
+                <li><a href="#services">Our Services</a></li>
+                <li><a href="my-bookings.html">My Bookings</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#faq">FAQs</a></li>
+            </ul>
+            <div class="footer-contact">
+                <p>Reach Us</p>
+                <div class="footcontact-container">
+                    <div class="foot-contact">
+                        <img src="https://www.svgrepo.com/show/532540/location-pin-alt-1.svg" alt="Location">
+                        <p>Event Flix, 4th Floor, KTM Showroom Complex, Amin Marg, 150 Feet Ring Rd, Rajkot, Gujarat
+                            360001</p>
+                    </div>
+                    <div class="foot-contact">
+                        <img src="https://www.svgrepo.com/show/532540/location-pin-alt-1.svg" alt="Location">
+                        <p>Aarya Apoch, 311, Vijay Cross Rd, Navrangpura, Ahmedabad, Gujarat 380009</p>
+                    </div>
+                    <div class="foot-contact">
+                        <img src="https://www.svgrepo.com/show/532540/location-pin-alt-1.svg" alt="Location">
+                        <p>2nd Floor, Event Flix, Krishna Complex, Near Reliance Digital, Junagadh, Gujarat 362002</p>
+                    </div>
+                    <div class="foot-contact">
+                        <img src="https://www.svgrepo.com/show/532540/location-pin-alt-1.svg" alt="Location">
+                        <p>Second Floor, Shop 2001, Event Flix, Veneziano Mall, Vesu, Surat, Gujarat 395007</p>
+                    </div>
+                    <div class="foot-contact">
+                        <img src="https://www.svgrepo.com/show/521923/whatsapp.svg" alt="WhatsApp">
+                        <p>+91 7984003900</p>
+                    </div>
+                    <div class="foot-contact">
+                        <img src="https://www.svgrepo.com/show/533200/mail-alt-3.svg" alt="Mail">
+                        <p>info@eventflix.in</p>
+                    </div>
+                </div>
+            </div>
+            <div class="foot-socialmedia">
+                <p>Social Media</p>
+                <a href="#"><img src="https://www.svgrepo.com/show/521923/whatsapp.svg" alt="WhatsApp"></a>
+                <a href="https://www.instagram.com/event__flix"><img
+                        src="https://www.svgrepo.com/show/521711/instagram.svg" alt="Instagram"></a>
+            </div>
+        </div>
+        <div class="footer-container">
+            <div class="footer-text">
+                Online booking platform for private theatre events.
+                Payments powered by secure payment gateways. <br>
+                Copyright ©2025 Event Flix - Private Movie Theaters - All Rights Reserved
+            </div>
+            <div class="footer-links">
+                <a href="/refund_policy">
+                    <div class="footer-link">Refund Policy</div>
+                </a>
+                <a href="/terms_conditions">
+                    <div class="footer-link">Terms and Conditions</div>
+                </a>
+                <a href="/privacy_policy">
+                    <div class="footer-link">Privacy Policy</div>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./js/script.js"></script>
+</body>
+
+</html>

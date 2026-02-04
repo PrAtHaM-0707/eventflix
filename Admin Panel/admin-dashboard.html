@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - EventFlix</title>
+  <link rel="shortcut icon" href="../img/Logo.png" type="image/png">
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">🎬</div>
+      <div class="sidebar-brand">
+        <h2>EventFlix</h2>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <div class="menu-section">
+        <div class="menu-section-title">Main</div>
+        <a href="#" class="menu-item active" data-page="dashboard">
+          <span class="icon">📊</span>
+          <span class="text">Dashboard</span>
+        </a>
+        <a href="#" class="menu-item" data-page="bookings">
+          <span class="icon">📅</span>
+          <span class="text">Bookings</span>
+          <span class="badge" id="pendingBadge">0</span>
+        </a>
+        <a href="#" class="menu-item" data-page="customers">
+          <span class="icon">👥</span>
+          <span class="text">Customers</span>
+        </a>
+      </div>
+
+      <div class="menu-section">
+        <div class="menu-section-title">Management</div>
+        <a href="#" class="menu-item" data-page="slots">
+          <span class="icon">🕐</span>
+          <span class="text">Slots</span>
+        </a>
+        <a href="#" class="menu-item" data-page="payments">
+          <span class="icon">💳</span>
+          <span class="text">Payments</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <span id="toggleIcon">◀</span>
+        <span class="toggle-text">Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+        <div>
+          <h1 class="page-title" id="pageTitle">Dashboard</h1>
+          <div class="breadcrumb">
+            <a href="#">Admin</a>
+            <span>/</span>
+            <span id="breadcrumbPage">Dashboard</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="header-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search bookings..." onkeypress="handleGlobalSearch(event)">
+        </div>
+
+        <div class="header-actions">
+          <button class="header-action-btn" onclick="refreshData()" title="Refresh">🔄</button>
+          <button class="header-action-btn" onclick="logout()" title="Logout">🚪</button>
+        </div>
+
+        <div class="admin-profile" onclick="toggleProfileMenu()">
+          <div class="admin-avatar" id="adminAvatar">A</div>
+          <div class="admin-info">
+            <div class="admin-name" id="adminName">Admin</div>
+            <div class="admin-role" id="adminRole">Super Admin</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content">
+      <!-- Dashboard Page -->
+      <div class="page active" id="dashboardPage">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info">
+              <h3 id="statTotalBookings">0</h3>
+              <p>Total Bookings</p>
+            </div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <h3 id="statTotalRevenue">₹0</h3>
+              <p>Total Revenue</p>
+            </div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+              <h3 id="statTotalCustomers">0</h3>
+              <p>Total Customers</p>
+            </div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+              <h3 id="statPendingBookings">0</h3>
+              <p>Pending Bookings</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location Stats -->
+        <div class="card">
+          <div class="card-header">
+            <h3>📍 Location-wise Bookings</h3>
+          </div>
+          <div class="card-body">
+            <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+              <div class="stat-card" style="border-left: 4px solid #3498db;">
+                <div class="stat-info">
+                  <h3 id="suratBookings">0</h3>
+                  <p>Surat</p>
+                </div>
+              </div>
+              <div class="stat-card" style="border-left: 4px solid #e74c3c;">
+                <div class="stat-info">
+                  <h3 id="ahmedabadBookings">0</h3>
+                  <p>Ahmedabad</p>
+                </div>
+              </div>
+              <div class="stat-card" style="border-left: 4px solid #2ecc71;">
+                <div class="stat-info">
+                  <h3 id="rajkotBookings">0</h3>
+                  <p>Rajkot</p>
+                </div>
+              </div>
+              <div class="stat-card" style="border-left: 4px solid #9b59b6;">
+                <div class="stat-info">
+                  <h3 id="junagadhBookings">0</h3>
+                  <p>Junagadh</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Package Breakdown -->
+        <div class="card">
+          <div class="card-header">
+            <h3>📦 Package Breakdown</h3>
+          </div>
+          <div class="card-body">
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                  <span>Silver Package</span>
+                  <span id="silverPercent">0%</span>
+                </div>
+                <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+                  <div id="silverBar" style="background: #95a5a6; height: 100%; width: 0%; transition: width 0.5s;">
+                  </div>
+                </div>
+                <small style="color: #888;" id="silverCount">0 bookings</small>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                  <span>Gold Package</span>
+                  <span id="goldPercent">0%</span>
+                </div>
+                <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+                  <div id="goldBar" style="background: #f1c40f; height: 100%; width: 0%; transition: width 0.5s;"></div>
+                </div>
+                <small style="color: #888;" id="goldCount">0 bookings</small>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                  <span>Platinum Package</span>
+                  <span id="platinumPercent">0%</span>
+                </div>
+                <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+                  <div id="platinumBar" style="background: #9b59b6; height: 100%; width: 0%; transition: width 0.5s;">
+                  </div>
+                </div>
+                <small style="color: #888;" id="platinumCount">0 bookings</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="card">
+          <div class="card-header">
+            <h3>📋 Recent Bookings</h3>
+            <button class="card-header-btn" onclick="showPage('bookings')">View All →</button>
+          </div>
+          <div class="card-body">
+            <div class="table-wrapper">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Package</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recentBookingsTable">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 40px;">
+                      <div class="loading-spinner"></div>
+                      <p style="margin-top: 10px; color: #888;">Loading...</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings Page -->
+      <div class="page" id="bookingsPage">
+        <div class="card">
+          <div class="card-header">
+            <h3>📅 All Bookings <span id="bookingsCount" style="font-weight: normal; font-size: 0.9rem;"></span></h3>
+            <div class="card-header-actions">
+              <button class="card-header-btn" onclick="exportBookings()">📥 Export CSV</button>
+              <button class="card-header-btn" onclick="refreshData()">🔄 Refresh</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Filters -->
+            <div class="filters">
+              <div class="search-box">
+                <input type="text" id="searchBookings" placeholder="Search by Order ID, Name, Phone..."
+                  oninput="filterBookings()">
+              </div>
+              <select class="filter-select" id="statusFilter" onchange="filterBookings()">
+                <option value="">All Status</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <select class="filter-select" id="locationFilter" onchange="filterBookings()">
+                <option value="">All Locations</option>
+                <option value="Surat">Surat</option>
+                <option value="Ahmedabad">Ahmedabad</option>
+                <option value="Rajkot">Rajkot</option>
+                <option value="Junagadh">Junagadh</option>
+              </select>
+              <select class="filter-select" id="packageFilter" onchange="filterBookings()">
+                <option value="">All Packages</option>
+                <option value="Silver">Silver</option>
+                <option value="Gold">Gold</option>
+                <option value="Platinum">Platinum</option>
+              </select>
+              <input type="date" class="filter-select" id="dateFilter" onchange="filterBookings()">
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrapper">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Package</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="allBookingsTable">
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span id="showingInfo">Showing 0 of 0</span>
+            <div id="pagination"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customers Page -->
+      <div class="page" id="customersPage">
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 30px;">
+          <div class="stat-card blue">
+            <div class="stat-info">
+              <h3 id="totalCustomersCount">0</h3>
+              <p>Total Customers</p>
+            </div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-info">
+              <h3 id="repeatCustomers">0</h3>
+              <p>Repeat Customers</p>
+            </div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-info">
+              <h3 id="avgSpending">₹0</h3>
+              <p>Avg. Spending</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>👥 All Customers <span id="customersCount" style="font-weight: normal; font-size: 0.9rem;"></span></h3>
+            <div class="card-header-actions">
+              <button class="card-header-btn" onclick="exportCustomers()">📥 Export</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="filters">
+              <div class="search-box">
+                <input type="text" id="searchCustomers" placeholder="Search by name, phone, email..."
+                  oninput="filterCustomers()">
+              </div>
+              <select class="filter-select" id="customerSort" onchange="sortCustomers()">
+                <option value="recent">Most Recent</option>
+                <option value="bookings">Most Bookings</option>
+                <option value="spent">Highest Spent</option>
+                <option value="name">Name A-Z</option>
+              </select>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Bookings</th>
+                    <th>Total Spent</th>
+                    <th>Last Booking</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="allCustomersTable">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slots Page -->
+      <div class="page" id="slotsPage">
+        <div class="card">
+          <div class="card-header">
+            <h3>🕐 Slot Management</h3>
+            <div class="card-header-actions">
+              <button class="card-header-btn" onclick="goToToday()">Today</button>
+              <button class="card-header-btn" onclick="goToTomorrow()">Tomorrow</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="filters">
+              <input type="date" class="filter-select" id="slotDate" onchange="loadSlots()">
+              <select class="filter-select" id="slotLocation" onchange="loadSlots()">
+                <option value="Surat">Surat</option>
+                <option value="Ahmedabad">Ahmedabad</option>
+                <option value="Rajkot">Rajkot</option>
+                <option value="Junagadh">Junagadh</option>
+              </select>
+            </div>
+
+            <h4 style="margin: 20px 0;" id="slotDateDisplay">Select a date</h4>
+
+            <div class="slots-grid" id="slotsGrid">
+              <p style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">
+                Select a date to view slots
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payments Page -->
+      <div class="page" id="paymentsPage">
+        <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 30px;">
+          <div class="stat-card green">
+            <div class="stat-info">
+              <h3 id="confirmedRevenue">₹0</h3>
+              <p>Confirmed Revenue</p>
+            </div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-info">
+              <h3 id="pendingRevenue">₹0</h3>
+              <p>Pending Payments</p>
+            </div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-info">
+              <h3 id="refundedAmount">₹0</h3>
+              <p>Refunded</p>
+            </div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-info">
+              <h3 id="avgOrderValue">₹0</h3>
+              <p>Avg. Order Value</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>💳 Payment Transactions</h3>
+            <button class="card-header-btn" onclick="exportPayments()">📥 Export</button>
+          </div>
+          <div class="card-body">
+            <div class="table-wrapper">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Transaction ID</th>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Package</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="paymentsTable">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Detail Modal -->
+  <div class="modal-overlay" id="bookingModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📋 Booking Details</h3>
+        <button class="modal-close" onclick="closeModal('bookingModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="bookingModalContent">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('bookingModal')">Close</button>
+        <button class="btn btn-primary" onclick="printBooking()">🖨️ Print</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Detail Modal -->
+  <div class="modal-overlay" id="customerModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>👤 Customer Details</h3>
+        <button class="modal-close" onclick="closeModal('customerModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="customerModalContent">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('customerModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 id="confirmTitle">Confirm</h3>
+        <button class="modal-close" onclick="closeModal('confirmModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage">Are you sure?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Cancel</button>
+        <button class="btn btn-danger" onclick="confirmAction()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="admin.js"></script>
+</body>
+
+</html>

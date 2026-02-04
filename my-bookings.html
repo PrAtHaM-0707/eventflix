@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - EventFlix</title>
+    <link rel="shortcut icon" href="img/Logo.png" type="image/png">
+    <link rel="stylesheet" href="css/my-bookings.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">
+            <a href="index.html"><img src="img/Logo.png" alt="Event Flix"></a>
+        </div>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#services">Our Services</a></li>
+            <li><a href="index.html#gallery">Gallery</a></li>
+            <li><a href="my-bookings.html" class="active">My Bookings</a></li>
+        </ul>
+        <div class="book">
+            <a href="index.html#book" class="book-btn">Book Now</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <h1>My Bookings</h1>
+            <p>View and manage your theatre bookings</p>
+        </div>
+
+        <div id="mainContent">
+            <!-- Login Section -->
+            <div class="login-section" id="loginSection">
+                <div class="icon">📱</div>
+                <h2>View Your Bookings</h2>
+                <p>Enter your phone number to see your bookings</p>
+
+                <!-- Phone Form -->
+                <div id="phoneFormContainer">
+                    <div class="form-group">
+                        <label for="userPhone">Mobile Number</label>
+                        <div class="phone-input-group">
+                            <input type="text" class="form-input country-code" value="+91" readonly>
+                            <input type="text" id="userPhone" class="form-input phone-input"
+                                placeholder="10 digit number" maxlength="10" inputmode="numeric">
+                        </div>
+                    </div>
+                    <button type="button" class="submit-btn" id="sendOtpBtn">View Bookings →</button>
+                </div>
+
+                <!-- OTP Form -->
+                <div id="otpFormContainer" style="display: none;">
+                    <p style="margin-bottom: 10px;">Enter OTP sent to <strong id="otpPhone">+91 XXXXXXXXXX</strong></p>
+                    <div class="otp-container" id="otpInputsContainer">
+                        <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+                    </div>
+                    <div class="otp-info">
+                        <span id="otpTimer">Resend OTP in 30s</span>
+                        <a id="resendBtn" style="display: none;">Resend OTP</a>
+                    </div>
+                    <button type="button" class="submit-btn" id="verifyBtn">Verify & View Bookings →</button>
+                    <button type="button" class="back-btn" id="changeNumberBtn">← Change Number</button>
+                </div>
+            </div>
+
+            <!-- Bookings Section -->
+            <div id="bookingsSection" style="display: none;">
+                <div class="user-info-bar" id="userInfoBar">
+                    <div class="user-details">
+                        <div class="avatar" id="userAvatar">U</div>
+                        <div class="info">
+                            <h3 id="userName">User</h3>
+                            <p id="userPhoneDisplay">+91 XXXXXXXXXX</p>
+                        </div>
+                    </div>
+                    <button type="button" class="logout-btn" id="logoutBtn">Logout</button>
+                </div>
+                <div id="bookingsContainer">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Loading your bookings...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Modal -->
+    <div class="modal-overlay" id="cancelModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>⚠️ Cancel Booking</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this booking?</p>
+                <p style="margin-top: 10px; font-size: 0.9rem;"><strong>Order ID:</strong> <span
+                        id="cancelOrderId">-</span></p>
+                <p style="margin-top: 15px; color: var(--success); font-size: 0.9rem;">✓ Refund will be processed within
+                    5-7 business days.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelModalClose">No, Keep It</button>
+                <button type="button" class="btn btn-danger" id="confirmCancelBtn">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        // State
+        let currentUser = null;
+        let currentPhone = '';
+        let tempPhone = '';
+        let otpTimerInterval = null;
+        let cancelOrderId = null;
+
+        // Elements
+        const elements = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            cacheElements();
+            setupEventListeners();
+            console.log('📋 My Bookings page loaded');
+        });
+
+        function cacheElements() {
+            elements.phoneFormContainer = document.getElementById('phoneFormContainer');
+            elements.otpFormContainer = document.getElementById('otpFormContainer');
+            elements.loginSection = document.getElementById('loginSection');
+            elements.bookingsSection = document.getElementById('bookingsSection');
+            elements.userPhone = document.getElementById('userPhone');
+            elements.sendOtpBtn = document.getElementById('sendOtpBtn');
+            elements.verifyBtn = document.getElementById('verifyBtn');
+            elements.changeNumberBtn = document.getElementById('changeNumberBtn');
+            elements.resendBtn = document.getElementById('resendBtn');
+            elements.logoutBtn = document.getElementById('logoutBtn');
+            elements.otpTimer = document.getElementById('otpTimer');
+            elements.otpPhone = document.getElementById('otpPhone');
+            elements.cancelModal = document.getElementById('cancelModal');
+            elements.cancelModalClose = document.getElementById('cancelModalClose');
+            elements.confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        }
+
+        function setupEventListeners() {
+            // Phone input
+            if (elements.userPhone) {
+                elements.userPhone.addEventListener('input', function () {
+                    this.value = this.value.replace(/\D/g, '').substring(0, 10);
+                });
+                elements.userPhone.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') handleSendOTP();
+                });
+            }
+
+            // Buttons
+            if (elements.sendOtpBtn) elements.sendOtpBtn.addEventListener('click', handleSendOTP);
+            if (elements.verifyBtn) elements.verifyBtn.addEventListener('click', handleVerifyOTP);
+            if (elements.changeNumberBtn) elements.changeNumberBtn.addEventListener('click', showPhoneForm);
+            if (elements.resendBtn) elements.resendBtn.addEventListener('click', handleResendOTP);
+            if (elements.logoutBtn) elements.logoutBtn.addEventListener('click', handleLogout);
+            if (elements.cancelModalClose) elements.cancelModalClose.addEventListener('click', closeCancelModal);
+            if (elements.confirmCancelBtn) elements.confirmCancelBtn.addEventListener('click', confirmCancel);
+
+            // OTP inputs
+            setupOTPInputs();
+        }
+
+        function setupOTPInputs() {
+            const inputs = document.querySelectorAll('.otp-input');
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', function () {
+                    this.value = this.value.replace(/\D/g, '').substring(0, 1);
+                    if (this.value && index < inputs.length - 1) inputs[index + 1].focus();
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Backspace' && !this.value && index > 0) inputs[index - 1].focus();
+                });
+                input.addEventListener('paste', function (e) {
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData('text');
+                    const digits = text.replace(/\D/g, '').substring(0, 6);
+                    digits.split('').forEach((d, i) => { if (inputs[i]) inputs[i].value = d; });
+                });
+            });
+        }
+
+        async function handleSendOTP() {
+            const phone = elements.userPhone ? elements.userPhone.value.trim() : '';
+
+            if (!phone || phone.length !== 10) {
+                showToast('Please enter a valid 10-digit phone number', 'error');
+                return;
+            }
+
+            tempPhone = phone;
+            elements.sendOtpBtn.disabled = true;
+            elements.sendOtpBtn.textContent = 'Checking...';
+
+            try {
+                // Direct login for now
+                const response = await fetch(`${API_URL}/api/auth/login-direct`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Welcome back!', 'success');
+                    // Skip OTP, go to bookings
+                    currentUser = data.user;
+                    currentPhone = phone;
+                    updateUserInfo();
+                    showBookingsSection();
+                    loadBookings(); // ADDED: Actually load the data
+                } else {
+                    showToast(data.message || 'Login failed', 'error');
+                }
+            } catch (error) {
+                showToast('Network error', 'error');
+            } finally {
+                elements.sendOtpBtn.disabled = false;
+                elements.sendOtpBtn.textContent = 'View Bookings →';
+            }
+        }
+
+        function showOTPForm(phone) {
+            elements.phoneFormContainer.style.display = 'none';
+            elements.otpFormContainer.style.display = 'block';
+            elements.otpPhone.textContent = '+91 ' + phone;
+            document.querySelectorAll('.otp-input').forEach(i => i.value = '');
+            document.querySelector('.otp-input')?.focus();
+            startOTPTimer();
+        }
+
+        function showPhoneForm() {
+            elements.phoneFormContainer.style.display = 'block';
+            elements.otpFormContainer.style.display = 'none';
+            document.querySelectorAll('.otp-input').forEach(i => i.value = '');
+            if (otpTimerInterval) clearInterval(otpTimerInterval);
+        }
+
+        function startOTPTimer() {
+            let seconds = 30;
+            elements.otpTimer.style.display = 'inline';
+            elements.otpTimer.textContent = `Resend OTP in ${seconds}s`;
+            elements.resendBtn.style.display = 'none';
+
+            if (otpTimerInterval) clearInterval(otpTimerInterval);
+
+            otpTimerInterval = setInterval(() => {
+                seconds--;
+                if (seconds <= 0) {
+                    clearInterval(otpTimerInterval);
+                    elements.otpTimer.style.display = 'none';
+                    elements.resendBtn.style.display = 'inline';
+                } else {
+                    elements.otpTimer.textContent = `Resend OTP in ${seconds}s`;
+                }
+            }, 1000);
+        }
+
+        async function handleResendOTP() {
+            if (!tempPhone) return;
+            try {
+                const response = await fetch(`${API_URL}/api/auth/send-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: tempPhone })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showToast('OTP resent!', 'success');
+                    startOTPTimer();
+                    if (data.otp) showToast(`Demo OTP: ${data.otp}`, 'info');
+                }
+            } catch (error) {
+                showToast('Failed to resend OTP', 'error');
+            }
+        }
+
+        async function handleVerifyOTP() {
+            const inputs = document.querySelectorAll('.otp-input');
+            let otp = '';
+            inputs.forEach(i => otp += i.value);
+
+            if (otp.length !== 6) {
+                showToast('Please enter complete 6-digit OTP', 'error');
+                return;
+            }
+
+            elements.verifyBtn.disabled = true;
+            elements.verifyBtn.textContent = 'Verifying...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/verify-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: tempPhone, otp })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Verified!', 'success');
+                    currentUser = data.user;
+                    currentPhone = tempPhone;
+                    showBookingsSection();
+                    loadBookings();
+                } else {
+                    showToast(data.message || 'Invalid OTP', 'error');
+                    elements.verifyBtn.disabled = false;
+                    elements.verifyBtn.textContent = 'Verify & View Bookings →';
+                }
+            } catch (error) {
+                showToast('Verification failed', 'error');
+                elements.verifyBtn.disabled = false;
+                elements.verifyBtn.textContent = 'Verify & View Bookings →';
+            }
+        }
+
+        function updateUserInfo() {
+             // Basic view update wrapper
+             document.getElementById('userName').textContent = currentUser?.name || 'User';
+             document.getElementById('userPhoneDisplay').textContent = '+91 ' + currentPhone; 
+        }
+
+        function showBookingsSection() {
+            elements.loginSection.style.display = 'none';
+            elements.bookingsSection.style.display = 'block';
+            document.getElementById('userName').textContent = currentUser?.name || 'User';
+            document.getElementById('userAvatar').textContent = (currentUser?.name || 'U').charAt(0).toUpperCase();
+            document.getElementById('userPhoneDisplay').textContent = '+91 ' + currentPhone;
+        }
+
+        async function loadBookings() {
+            const container = document.getElementById('bookingsContainer');
+            container.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/orders?phone=${currentPhone}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    renderBookings(data.orders || []);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">⚠️</div>
+                        <h3>Error Loading Bookings</h3>
+                        <p>Please try again.</p>
+                        <button class="btn" onclick="loadBookings()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderBookings(bookings) {
+            const container = document.getElementById('bookingsContainer');
+
+            if (!bookings || bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📅</div>
+                        <h3>No Bookings Found</h3>
+                        <p>You haven't made any bookings yet.</p>
+                        <a href="index.html#book" class="btn">Book Now</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '<div class="bookings-list">' + bookings.map(order => {
+                const booking = order.booking || {};
+                return `
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <span class="order-id">${order.orderId || '-'}</span>
+                            <span class="status-badge ${order.status || 'pending'}">${(order.status || 'pending').toUpperCase()}</span>
+                        </div>
+                        <div class="booking-body">
+                            <div class="booking-details">
+                                <div class="detail-item"><div class="label">Package</div><div class="value">${booking.package || '-'}</div></div>
+                                <div class="detail-item"><div class="label">Location</div><div class="value">${booking.location || '-'}</div></div>
+                                <div class="detail-item"><div class="label">Date</div><div class="value">${formatDate(booking.date)}</div></div>
+                                <div class="detail-item"><div class="label">Time</div><div class="value">${booking.slotLabel || '-'}</div></div>
+                                <div class="detail-item"><div class="label">Amount</div><div class="value" style="color: var(--success);">₹${formatNumber(order.amount || 0)}</div></div>
+                                <div class="detail-item"><div class="label">Booked On</div><div class="value">${formatDateTime(order.createdAt)}</div></div>
+                            </div>
+                            ${order.status !== 'cancelled' ? `<div class="booking-footer"><button type="button" class="btn btn-danger" onclick="openCancelModal('${order.orderId}')">Cancel Booking</button></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('') + '</div>';
+        }
+
+        function openCancelModal(orderId) {
+            cancelOrderId = orderId;
+            document.getElementById('cancelOrderId').textContent = orderId;
+            elements.cancelModal.classList.add('active');
+        }
+
+        function closeCancelModal() {
+            cancelOrderId = null;
+            elements.cancelModal.classList.remove('active');
+        }
+
+        async function confirmCancel() {
+            if (!cancelOrderId) return;
+
+            elements.confirmCancelBtn.disabled = true;
+            elements.confirmCancelBtn.textContent = 'Cancelling...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/orders/cancel`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: cancelOrderId, phone: currentPhone })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Booking cancelled. Refund in 5-7 days.', 'success');
+                    closeCancelModal();
+                    loadBookings();
+                } else {
+                    showToast(data.message || 'Failed to cancel', 'error');
+                }
+            } catch (error) {
+                showToast('Error cancelling', 'error');
+            } finally {
+                elements.confirmCancelBtn.disabled = false;
+                elements.confirmCancelBtn.textContent = 'Yes, Cancel';
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            currentPhone = '';
+            elements.loginSection.style.display = 'block';
+            elements.bookingsSection.style.display = 'none';
+            elements.userPhone.value = '';
+            showPhoneForm();
+            showToast('Logged out', 'info');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-IN').format(num || 0);
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${icons[type]}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+    </script>
+</body>
+
+</html>

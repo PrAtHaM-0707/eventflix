@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventFlix - Choose Your Package</title>
+  <link rel="shortcut icon" href="img/Logo.png" type="image/png">
+  <!-- Cashfree SDK -->
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+  <link rel="stylesheet" href="css/package.css">
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav>
+    <div class="logo">
+      <a href="index.html"><img src="img/Logo.png" alt="Event Flix"></a>
+    </div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#services">Our Services</a></li>
+      <li><a href="index.html#gallery">Gallery</a></li>
+      <li><a href="my-bookings.html">My Bookings</a></li>
+    </ul>
+    <div class="book">
+      <a href="index.html#book" class="book-btn">Book Now</a>
+    </div>
+  </nav>
+
+  <!-- Payment Mode Banner -->
+  <div class="payment-mode-banner" id="paymentModeBanner">
+    ⚠️ Demo Mode: Payments will be simulated (Cashfree not configured)
+  </div>
+
+  <!-- Location Banner -->
+  <div class="location-banner">
+    <h2>
+      EVENT FLIX <span id="locationName">-</span>
+      <button type="button" class="change-btn" onclick="window.changeLocation()">📍 Change Location</button>
+    </h2>
+  </div>
+
+  <!-- Booking Info Bar -->
+  <div class="booking-info-bar">
+    <div class="booking-info-item">
+      <span class="icon">📍</span>
+      <div>
+        <div class="label">LOCATION</div>
+        <div class="value" id="displayLocation">-</div>
+      </div>
+    </div>
+    <div class="booking-info-item">
+      <span class="icon">📅</span>
+      <div>
+        <div class="label">DATE</div>
+        <div class="value" id="displayDate">-</div>
+      </div>
+    </div>
+    <div class="booking-info-item">
+      <span class="icon">📞</span>
+      <div>
+        <div class="label">CONTACT</div>
+        <div class="value" id="displayContact">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="page-header">
+      <h1>Choose Your Package</h1>
+      <p>Birthdays • Anniversaries • Date Nights • Surprises • Parties</p>
+    </div>
+
+    <div id="packagesContainer" class="packages-grid">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading packages...</p>
+      </div>
+    </div>
+
+    <div class="contact-section">
+      <h3>📞 Need Help? Call Us!</h3>
+      <p>Our team is ready to assist you with your booking</p>
+      <a href="#" class="contact-number" id="contactLink">
+        📱 <span id="contactNumber">-</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <button type="button" class="modal-close" onclick="window.closeModal()">&times;</button>
+      <div class="modal-header">
+        <h3>🎬 Complete Your Booking</h3>
+        <p>Enter your details to continue</p>
+      </div>
+      <div class="modal-body">
+        <div class="booking-summary">
+          <h4>📋 Booking Summary</h4>
+          <p><strong>Package:</strong> <span id="summaryPackage">-</span></p>
+          <p><strong>Date:</strong> <span id="summaryDate">-</span></p>
+          <p><strong>Time:</strong> <span id="summarySlot">-</span></p>
+          <p><strong>Location:</strong> <span id="summaryLocation">-</span></p>
+          <p class="total">Total: ₹<span id="summaryAmount">0</span></p>
+        </div>
+
+        <!-- Phone step -->
+        <div id="phoneFormContainer">
+          <div class="form-group">
+            <label for="userName">Your Name</label>
+            <input type="text" id="userName" class="form-input" placeholder="Enter your full name" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="userPhone">Mobile Number</label>
+            <div class="phone-input-group">
+              <input type="text" class="form-input country-code" value="+91" readonly>
+              <input type="tel" id="userPhone" class="form-input phone-input" placeholder="10 digit number"
+                maxlength="10" autocomplete="tel">
+            </div>
+          </div>
+          <button type="button" class="submit-btn" id="sendOtpBtn">Send OTP →</button>
+        </div>
+
+        <!-- OTP step -->
+        <div id="otpFormContainer" style="display: none;">
+          <p style="text-align:center;margin-bottom:10px;">
+            Enter OTP sent to <strong id="otpPhone">+91 XXXXXXXXXX</strong>
+          </p>
+          <div class="otp-container" id="otpInputsContainer">
+            <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+            <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+            <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+            <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+            <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+            <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+          </div>
+          <div class="otp-info">
+            <span id="otpTimer">Resend OTP in 30s</span>
+            <a id="resendBtn" style="display:none;">Resend OTP</a>
+          </div>
+          <button type="button" class="submit-btn" id="verifyBtn">Verify & Pay →</button>
+          <button type="button" class="back-btn" id="changeNumberBtn">← Change Number</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Processing Modal -->
+  <div class="modal-overlay" id="processingModal">
+    <div class="processing-content">
+      <div class="spinner"></div>
+      <h3 id="processingTitle">Processing Payment...</h3>
+      <p id="processingText" style="color:#888;">Please wait, do not close this window</p>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // ====================================================
+    // CONFIGURATION
+    // ====================================================
+    const API_URL = 'http://localhost:5000';
+
+    // Initialize Cashfree SDK
+    let cashfree = null;
+    let cashfreeReady = false;
+
+    function initCashfree() {
+      try {
+        // Try sandbox mode first
+        cashfree = Cashfree({ mode: "sandbox" });
+        cashfreeReady = true;
+        console.log('✅ Cashfree SDK initialized (Sandbox Mode)');
+        return true;
+      } catch (e) {
+        console.warn('⚠️ Cashfree SDK initialization failed:', e.message);
+        cashfreeReady = false;
+        return false;
+      }
+    }
+
+    // ====================================================
+    // STATE VARIABLES
+    // ====================================================
+    let selectedLocation = '';
+    let selectedDate = '';
+    let selectedPackage = null;
+    let selectedSlot = null;
+    let locationData = null;
+    let bookedSlots = [];
+    let otpTimerInterval = null;
+    let tempUser = { name: '', phone: '' };
+    let isPaymentMode = 'demo'; // 'demo' or 'live'
+
+    const els = {};
+
+    // ====================================================
+    // INITIALIZATION
+    // ====================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      cacheEls();
+      initCashfree();
+      const paramsValid = initFromURL();
+      setupEvents();
+      if (paramsValid) {
+        loadData();
+      }
+    });
+
+    function cacheEls() {
+      els.packagesContainer = document.getElementById('packagesContainer');
+      els.loginModal = document.getElementById('loginModal');
+      els.processingModal = document.getElementById('processingModal');
+      els.phoneFormContainer = document.getElementById('phoneFormContainer');
+      els.otpFormContainer = document.getElementById('otpFormContainer');
+      els.userName = document.getElementById('userName');
+      els.userPhone = document.getElementById('userPhone');
+      els.sendOtpBtn = document.getElementById('sendOtpBtn');
+      els.verifyBtn = document.getElementById('verifyBtn');
+      els.changeNumberBtn = document.getElementById('changeNumberBtn');
+      els.resendBtn = document.getElementById('resendBtn');
+      els.otpTimer = document.getElementById('otpTimer');
+      els.otpPhone = document.getElementById('otpPhone');
+      els.otpInputsContainer = document.getElementById('otpInputsContainer');
+      els.toastContainer = document.getElementById('toastContainer');
+      els.paymentModeBanner = document.getElementById('paymentModeBanner');
+      els.processingTitle = document.getElementById('processingTitle');
+      els.processingText = document.getElementById('processingText');
+    }
+
+    function initFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      selectedLocation = params.get('location');
+      selectedDate = params.get('date');
+
+      if (!selectedLocation || !selectedDate) {
+        showError('Missing Information', 'Please select a location and date first.');
+        return false;
+      }
+
+      const dateObj = new Date(selectedDate);
+      if (isNaN(dateObj.getTime())) {
+        showError('Invalid Date', 'The selected date is invalid. Please try again.');
+        return false;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (dateObj < today) {
+        showError('Invalid Date', 'Cannot book for past dates. Please select a future date.');
+        return false;
+      }
+
+      document.getElementById('locationName').textContent = selectedLocation.toUpperCase();
+      document.getElementById('displayLocation').textContent = selectedLocation;
+      document.getElementById('displayDate').textContent = formatDisplayDate(selectedDate);
+
+      return true;
+    }
+
+    function setupEvents() {
+      els.userPhone.addEventListener('input', () => {
+        els.userPhone.value = els.userPhone.value.replace(/\D/g, '').substring(0, 10);
+      });
+      els.userPhone.addEventListener('keypress', e => {
+        if (!/[0-9]/.test(e.key) && e.key !== 'Enter') e.preventDefault();
+      });
+      els.userPhone.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleSendOTP();
+        }
+      });
+
+      els.userName.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          els.userPhone.focus();
+        }
+      });
+
+      els.sendOtpBtn.addEventListener('click', handleSendOTP);
+      els.verifyBtn.addEventListener('click', handleVerifyOTP);
+      els.changeNumberBtn.addEventListener('click', showPhoneForm);
+      els.resendBtn.addEventListener('click', handleResendOTP);
+
+      setupOTPInputs();
+
+      els.loginModal.addEventListener('click', (e) => {
+        if (e.target === els.loginModal) {
+          window.closeModal();
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (els.loginModal.classList.contains('active')) {
+            window.closeModal();
+          }
+        }
+      });
+    }
+
+    function setupOTPInputs() {
+      const inputs = els.otpInputsContainer.querySelectorAll('.otp-input');
+      inputs.forEach((input, idx) => {
+        input.addEventListener('input', () => {
+          input.value = input.value.replace(/\D/g, '').substring(0, 1);
+          if (input.value && idx < inputs.length - 1) {
+            inputs[idx + 1].focus();
+          }
+        });
+        input.addEventListener('keydown', e => {
+          if (e.key === 'Backspace' && !input.value && idx > 0) {
+            inputs[idx - 1].focus();
+          }
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleVerifyOTP();
+          }
+        });
+        input.addEventListener('paste', e => {
+          e.preventDefault();
+          const v = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').substring(0, 6);
+          v.split('').forEach((d, i) => {
+            if (inputs[i]) inputs[i].value = d;
+          });
+          if (v.length === 6) {
+            inputs[5].focus();
+          }
+        });
+      });
+    }
+
+    // ====================================================
+    // DATA LOADING
+    // ====================================================
+    async function loadData() {
+      try {
+        await loadPackages();
+        await loadSlots();
+        checkPaymentMode();
+      } catch (e) {
+        console.error('Error loading data:', e);
+        showError('Loading Error', 'Failed to load data. Please refresh the page.');
+      }
+    }
+
+    async function checkPaymentMode() {
+      try {
+        const res = await fetch(`${API_URL}/health`);
+        const data = await res.json();
+
+        // Check if server has Cashfree configured
+        const testOrder = await fetch(`${API_URL}/api/packages/${encodeURIComponent(selectedLocation)}`);
+        const testData = await testOrder.json();
+
+        // We'll determine mode based on first order attempt
+        // For now, show demo mode if Cashfree SDK isn't ready
+        if (!cashfreeReady) {
+          isPaymentMode = 'demo';
+          els.paymentModeBanner.innerHTML = '⚠️ Demo Mode: Payments will be simulated';
+          els.paymentModeBanner.classList.remove('live');
+        }
+      } catch (e) {
+        isPaymentMode = 'demo';
+      }
+    }
+
+    async function loadPackages() {
+      try {
+        const res = await fetch(`${API_URL}/api/packages/${encodeURIComponent(selectedLocation)}`);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Failed to load packages');
+        locationData = data;
+        document.getElementById('displayContact').textContent = data.contact || '-';
+        document.getElementById('contactNumber').textContent = data.contact || '-';
+        document.getElementById('contactLink').href = data.contact ? `tel:+91${data.contact}` : '#';
+      } catch (e) {
+        console.error('loadPackages error:', e);
+        showToast('Failed to load packages: ' + e.message, 'error');
+        throw e;
+      }
+    }
+
+    async function loadSlots() {
+      try {
+        const res = await fetch(`${API_URL}/api/slots?date=${encodeURIComponent(selectedDate)}&location=${encodeURIComponent(selectedLocation)}`);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        const data = await res.json();
+        
+        // Handle new per-package availability format
+        if (data.success && data.bookedMap) {
+          bookedSlots = data.bookedMap; // Object { Silver: [], Gold: [] }
+        } else if (data.success && data.slots) {
+           // Fallback for old format
+           const globalList = data.slots.filter(s => s.booked).map(s => s.id);
+           bookedSlots = { 'Global': globalList };
+        } else {
+          bookedSlots = {};
+        }
+        
+        // Handle global blocks
+        if (data.globalBookings && Array.isArray(data.globalBookings)) {
+           bookedSlots['Global'] = data.globalBookings;
+        }
+
+      } catch (e) {
+        console.error('loadSlots error:', e);
+        bookedSlots = {};
+      }
+      renderPackages();
+    }
+
+    function renderPackages() {
+      if (!locationData || !locationData.packages) {
+        showError('No Packages', 'Could not load packages for this location.');
+        return;
+      }
+
+      const pkgs = locationData.packages;
+      const order = ['Silver', 'Gold', 'Platinum'];
+      const images = {
+        Silver: 'img/silver.jpg',
+        Gold: 'img/gold.jpg',
+        Platinum: 'img/platinum.jpg'
+      };
+      let html = '';
+      let count = 0;
+
+      order.forEach(name => {
+        const p = pkgs[name];
+        if (!p) return;
+        count++;
+        const popular = p.popular;
+        const safeName = escapeHtml(name);
+        html += `
+          <div class="package-card ${popular ? 'popular' : ''}">
+            ${popular ? '<div class="popular-badge">⭐ Popular</div>' : ''}
+            <img src="${images[name]}" 
+                 onerror="this.src='https://via.placeholder.com/400x200/6C5CE7/fff?text=${encodeURIComponent(name)}'" 
+                 class="package-image" 
+                 alt="${safeName} Package">
+            <div class="package-content">
+              <h3 class="package-name">${safeName} Package</h3>
+              <div class="package-price"><span class="amount">₹${formatNumber(p.price)}</span></div>
+              <h4 class="features-title">✨ Features</h4>
+              <ul class="features-list">
+                ${(p.features || []).map(f => `<li>${escapeHtml(f)}</li>`).join('')}
+              </ul>
+              <div class="slots-section">
+                <h4 class="slots-title">Select Time Slot</h4>
+                <div class="slots-grid" id="slots-${name}">
+                  ${renderSlotButtons(name)}
+                </div>
+              </div>
+              <button type="button" class="book-package-btn" id="bookBtn-${name}" disabled 
+                      onclick="window.initiateBooking('${name}')">
+                Select a Slot First
+              </button>
+            </div>
+          </div>`;
+      });
+
+      if (!count) {
+        showError('No Packages', 'No packages configured for this location.');
+      } else {
+        els.packagesContainer.innerHTML = html;
+      }
+    }
+
+    function renderSlotButtons(pkgName) {
+      const slots = [
+        { id: 'slot-1', label: '11 AM - 1 PM' },
+        { id: 'slot-2', label: '1 PM - 3 PM' },
+        { id: 'slot-3', label: '3 PM - 5 PM' },
+        { id: 'slot-4', label: '5 PM - 7 PM' },
+        { id: 'slot-5', label: '7 PM - 9 PM' },
+        { id: 'slot-6', label: '9 PM - 11 PM' }
+      ];
+      
+      // Check package specific bookings + global bookings
+      const pkgBooked = bookedSlots[pkgName] || [];
+      const globalBooked = bookedSlots['Global'] || [];
+      const allBooked = [...pkgBooked, ...globalBooked];
+
+      return slots.map(s => {
+        const booked = allBooked.includes(s.id);
+        if (booked) {
+          return `<button type="button" class="slot-btn booked" disabled title="This slot is already booked">${s.label}</button>`;
+        }
+        return `<button type="button" class="slot-btn" onclick="window.selectSlot(this,'${pkgName}','${s.id}','${s.label}')">${s.label}</button>`;
+      }).join('');
+    }
+
+    // ====================================================
+    // SLOT SELECTION
+    // ====================================================
+    window.selectSlot = function (el, pkgName, slotId, slotLabel) {
+      document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('.book-package-btn').forEach(b => {
+        b.disabled = true;
+        b.textContent = 'Select a Slot First';
+      });
+
+      el.classList.add('selected');
+      selectedSlot = { id: slotId, label: slotLabel };
+      selectedPackage = { name: pkgName, ...locationData.packages[pkgName] };
+
+      const btn = document.getElementById(`bookBtn-${pkgName}`);
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = `Book ${pkgName} - ₹${formatNumber(selectedPackage.price)}`;
+      }
+    };
+
+    window.initiateBooking = function (pkgName) {
+      if (!selectedSlot) {
+        showToast('Please select a time slot', 'warning');
+        return;
+      }
+      if (!selectedPackage || selectedPackage.name !== pkgName) {
+        showToast('Please select a slot for this package', 'warning');
+        return;
+      }
+
+      document.getElementById('summaryPackage').textContent = pkgName + ' Package';
+      document.getElementById('summaryDate').textContent = formatDisplayDate(selectedDate);
+      document.getElementById('summarySlot').textContent = selectedSlot.label;
+      document.getElementById('summaryLocation').textContent = selectedLocation;
+      document.getElementById('summaryAmount').textContent = formatNumber(selectedPackage.price);
+
+      showPhoneForm();
+      els.userName.value = '';
+      els.userPhone.value = '';
+      els.loginModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => els.userName.focus(), 200);
+    };
+
+    // ====================================================
+    // OTP HANDLING
+    // ====================================================
+    async function handleSendOTP() {
+      const name = els.userName.value.trim();
+      const phone = els.userPhone.value.trim();
+
+      if (!name) {
+        showToast('Please enter your name', 'warning');
+        els.userName.focus();
+        return;
+      }
+      if (name.length < 2) {
+        showToast('Name must be at least 2 characters', 'warning');
+        els.userName.focus();
+        return;
+      }
+      if (!/^\d{10}$/.test(phone)) {
+        showToast('Please enter a valid 10-digit phone number', 'warning');
+        els.userPhone.focus();
+        return;
+      }
+
+      tempUser = { name, phone };
+      els.sendOtpBtn.disabled = true;
+      els.sendOtpBtn.textContent = 'Processing...';
+
+      try {
+        // Direct Login (No OTP for now)
+        const res = await fetch(`${API_URL}/api/auth/login-direct`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, name })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          showToast('Booking details saved!', 'success');
+          // Skip OTP, proceed directly
+          await proceedToPayment(data.user);
+        } else {
+          showToast(data.message || 'Login failed', 'error');
+        }
+      } catch (e) {
+        console.error('Login error:', e);
+        showToast('Error: ' + e.message, 'error');
+      } finally {
+        els.sendOtpBtn.disabled = false;
+        els.sendOtpBtn.textContent = 'Continue to Payment →';
+      }
+    }
+
+    function showOTPForm(phone) {
+      els.phoneFormContainer.style.display = 'none';
+      els.otpFormContainer.style.display = 'block';
+      els.otpPhone.textContent = '+91 ' + phone;
+
+      const inputs = els.otpInputsContainer.querySelectorAll('.otp-input');
+      inputs.forEach(i => i.value = '');
+      inputs[0].focus();
+
+      startOTPTimer();
+    }
+
+    function showPhoneForm() {
+      els.phoneFormContainer.style.display = 'block';
+      els.otpFormContainer.style.display = 'none';
+      if (otpTimerInterval) {
+        clearInterval(otpTimerInterval);
+        otpTimerInterval = null;
+      }
+      els.verifyBtn.disabled = false;
+      els.verifyBtn.textContent = 'Verify & Pay →';
+    }
+
+    function startOTPTimer() {
+      let s = 30;
+      els.otpTimer.style.display = 'inline';
+      els.resendBtn.style.display = 'none';
+      els.otpTimer.textContent = `Resend OTP in ${s}s`;
+
+      if (otpTimerInterval) {
+        clearInterval(otpTimerInterval);
+      }
+
+      otpTimerInterval = setInterval(() => {
+        s--;
+        if (s <= 0) {
+          clearInterval(otpTimerInterval);
+          otpTimerInterval = null;
+          els.otpTimer.style.display = 'none';
+          els.resendBtn.style.display = 'inline';
+        } else {
+          els.otpTimer.textContent = `Resend OTP in ${s}s`;
+        }
+      }, 1000);
+    }
+
+    async function handleResendOTP() {
+      els.resendBtn.style.display = 'none';
+      els.otpTimer.style.display = 'inline';
+      els.otpTimer.textContent = 'Sending...';
+
+      try {
+        const res = await fetch(`${API_URL}/api/auth/send-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(tempUser)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('OTP resent successfully!', 'success');
+          startOTPTimer();
+          if (data.otp) {
+            console.log('🔐 Demo OTP:', data.otp);
+            showToast(`Demo OTP: ${data.otp}`, 'info');
+          }
+        } else {
+          showToast(data.message || 'Failed to resend OTP', 'error');
+          els.otpTimer.style.display = 'none';
+          els.resendBtn.style.display = 'inline';
+        }
+      } catch (e) {
+        console.error('Resend OTP error:', e);
+        showToast('Failed to resend OTP', 'error');
+        els.otpTimer.style.display = 'none';
+        els.resendBtn.style.display = 'inline';
+      }
+    }
+
+    async function handleVerifyOTP() {
+      const inputs = els.otpInputsContainer.querySelectorAll('.otp-input');
+      let otp = '';
+      inputs.forEach(i => otp += i.value);
+
+      if (otp.length !== 6) {
+        showToast('Please enter the complete 6-digit OTP', 'warning');
+        return;
+      }
+
+      els.verifyBtn.disabled = true;
+      els.verifyBtn.textContent = 'Verifying...';
+
+      try {
+        const res = await fetch(`${API_URL}/api/auth/verify-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: tempUser.phone, otp, name: tempUser.name })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          showToast('OTP Verified! Proceeding to payment...', 'success');
+          await proceedToPayment(data.user);
+        } else {
+          showToast(data.message || 'Invalid OTP. Please try again.', 'error');
+          els.verifyBtn.disabled = false;
+          els.verifyBtn.textContent = 'Verify & Pay →';
+          inputs.forEach(i => i.value = '');
+          inputs[0].focus();
+        }
+      } catch (e) {
+        console.error('Verify OTP error:', e);
+        showToast('Error: ' + e.message, 'error');
+        els.verifyBtn.disabled = false;
+        els.verifyBtn.textContent = 'Verify & Pay →';
+      }
+    }
+
+    // ====================================================
+    // PAYMENT PROCESSING
+    // ====================================================
+    async function proceedToPayment(user) {
+      window.closeModal();
+      showProcessingModal('Creating Order...', 'Please wait while we prepare your booking');
+
+      try {
+        // Step 1: Check slot availability again
+        console.log('📋 Checking slot availability...');
+        const checkRes = await fetch(`${API_URL}/api/slots/check?date=${encodeURIComponent(selectedDate)}&location=${encodeURIComponent(selectedLocation)}&slotId=${encodeURIComponent(selectedSlot.id)}&package=${encodeURIComponent(selectedPackage.name)}`);
+
+        if (!checkRes.ok) {
+          throw new Error('Failed to check slot availability');
+        }
+
+        const checkData = await checkRes.json();
+        if (!checkData.available) {
+          hideProcessingModal();
+          showToast('Sorry, this slot was just booked. Please choose another.', 'error');
+          await loadSlots();
+          selectedSlot = null;
+          selectedPackage = null;
+          return;
+        }
+
+        // Step 2: Create order
+        console.log('💳 Creating order...');
+        showProcessingModal('Processing Payment...', 'Connecting to payment gateway');
+
+        const orderRes = await fetch(`${API_URL}/api/orders/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customer: {
+              name: user.name,
+              phone: user.phone
+            },
+            booking: {
+              location: selectedLocation,
+              date: selectedDate,
+              slotId: selectedSlot.id,
+              slotLabel: selectedSlot.label,
+              package: selectedPackage.name
+            }
+          })
+        });
+
+        if (!orderRes.ok) {
+          const errData = await orderRes.json().catch(() => ({}));
+          throw new Error(errData.message || 'Failed to create order');
+        }
+
+        const orderData = await orderRes.json();
+        console.log('📦 Order created:', orderData);
+
+        if (!orderData.success) {
+          throw new Error(orderData.message || 'Order creation failed');
+        }
+
+        // Step 3: Process payment
+        if (orderData.paymentSessionId && cashfree && cashfreeReady) {
+          // Live Cashfree Payment
+          console.log('🔄 Redirecting to Cashfree...');
+          showProcessingModal('Redirecting to Payment...', 'You will be redirected to the payment page');
+
+          try {
+            const checkoutResult = await cashfree.checkout({
+              paymentSessionId: orderData.paymentSessionId,
+              redirectTarget: "_self"
+            });
+
+            // This code runs only if redirect fails
+            if (checkoutResult.error) {
+              console.error('Cashfree checkout error:', checkoutResult.error);
+              hideProcessingModal();
+              showToast('Payment failed: ' + (checkoutResult.error.message || 'Unknown error'), 'error');
+            }
+          } catch (cfError) {
+            console.error('Cashfree checkout exception:', cfError);
+            hideProcessingModal();
+            showToast('Payment gateway error. Using demo mode.', 'warning');
+            // Fall back to demo mode
+            await simulatePayment(orderData.orderId);
+          }
+        } else {
+          // Demo mode - simulate payment
+          console.log('🎮 Demo mode: Simulating payment...');
+          await simulatePayment(orderData.orderId);
+        }
+
+      } catch (e) {
+        console.error('Payment error:', e);
+        hideProcessingModal();
+        showToast('Error: ' + e.message, 'error');
+      }
+    }
+
+    async function simulatePayment(orderId) {
+      showProcessingModal('Simulating Payment...', 'Demo mode - no actual payment');
+
+      try {
+        // Simulate payment delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        console.log('✅ Verifying payment for order:', orderId);
+
+        const res = await fetch(`${API_URL}/api/orders/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, demo: true })
+        });
+
+        if (!res.ok) {
+          throw new Error('Payment verification failed');
+        }
+
+        const data = await res.json();
+        console.log('📋 Verification result:', data);
+
+        if (data.success && data.paid) {
+          showProcessingModal('Booking Confirmed!', 'Redirecting to confirmation page...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          window.location.href = `booking-success.html?order_id=${encodeURIComponent(orderId)}`;
+        } else {
+          throw new Error('Payment not confirmed');
+        }
+      } catch (e) {
+        console.error('Simulate payment error:', e);
+        hideProcessingModal();
+        showToast('Error confirming booking: ' + e.message, 'error');
+      }
+    }
+
+    // ====================================================
+    // UI HELPERS
+    // ====================================================
+    function showProcessingModal(title, text) {
+      els.processingTitle.textContent = title || 'Processing...';
+      els.processingText.textContent = text || 'Please wait';
+      els.processingModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideProcessingModal() {
+      els.processingModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    window.closeModal = function () {
+      els.loginModal.classList.remove('active');
+      document.body.style.overflow = '';
+      showPhoneForm();
+      if (otpTimerInterval) {
+        clearInterval(otpTimerInterval);
+        otpTimerInterval = null;
+      }
+    };
+
+    window.changeLocation = function () {
+      window.location.href = 'index.html#book';
+    };
+
+    function formatDisplayDate(d) {
+      if (!d) return '-';
+      try {
+        return new Date(d).toLocaleDateString('en-IN', {
+          weekday: 'short',
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        });
+      } catch (e) {
+        return d;
+      }
+    }
+
+    function formatNumber(n) {
+      return new Intl.NumberFormat('en-IN').format(n || 0);
+    }
+
+    function escapeHtml(t) {
+      const div = document.createElement('div');
+      div.textContent = t || '';
+      return div.innerHTML;
+    }
+
+    function showError(title, msg) {
+      els.packagesContainer.innerHTML = `
+        <div class="error-state">
+          <div class="icon">⚠️</div>
+          <h3>${escapeHtml(title)}</h3>
+          <p>${escapeHtml(msg)}</p>
+          <a href="index.html#book" class="btn">Go Back</a>
+        </div>`;
+    }
+
+    function showToast(msg, type = 'info') {
+      const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${escapeHtml(msg)}</span>`;
+      els.toastContainer.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(50px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed - EventFlix</title>
+    <link rel="shortcut icon" href="img/Logo.png" type="image/png">
+    <link rel="stylesheet" href="css/booking-success.css">
+</head>
+
+<body>
+    <div class="container" id="mainContainer">
+        <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+            <h3>Loading booking details...</h3>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            const orderId = new URLSearchParams(window.location.search).get('order_id');
+            if (!orderId) { showError('No Order Found', 'Order ID is missing.'); return; }
+
+            try {
+                // Verify payment status (remove demo: true to check actual status)
+                const verifyRes = await fetch(`${API_URL}/api/orders/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId })
+                });
+
+                const data = await verifyRes.json();
+
+                if (data.success) {
+                    if (data.paid) {
+                        renderSuccess(data.order);
+                    } else {
+                        renderFailure(data.order);
+                    }
+                } else {
+                    throw new Error(data.message || 'Order not found');
+                }
+            } catch (error) {
+                console.error('Success Page Error:', error);
+                showError('Connection Error', 'Could not verify booking. Server might be offline.');
+            }
+        });
+
+        function renderSuccess(order) {
+            const booking = order.booking || {};
+            const customer = order.customer || {};
+
+            document.getElementById('mainContainer').innerHTML = `
+                <div class="header">
+                    <div class="success-icon">✓</div>
+                    <h1>Booking Confirmed!</h1>
+                    <p>Your celebration is all set 🎉</p>
+                </div>
+                <div class="content">
+                    <div class="order-id">
+                        <label>BOOKING ID</label>
+                        <div class="value">${order.orderId}</div>
+                    </div>
+                    <div class="details">
+                        <div class="detail-row"><span class="label">Customer</span><span class="value">${customer.name || '-'}</span></div>
+                        <div class="detail-row"><span class="label">Phone</span><span class="value">+91 ${customer.phone || '-'}</span></div>
+                        <div class="detail-row"><span class="label">Package</span><span class="value">${booking.package || '-'}</span></div>
+                        <div class="detail-row"><span class="label">Location</span><span class="value">${booking.location || '-'}</span></div>
+                        <div class="detail-row"><span class="label">Date</span><span class="value">${formatDate(booking.date)}</span></div>
+                        <div class="detail-row"><span class="label">Time</span><span class="value">${booking.slotLabel || '-'}</span></div>
+                        <div class="detail-row total"><span class="label">Amount Paid</span><span class="value">₹${formatNumber(order.amount)}</span></div>
+                    </div>
+                    <div class="actions">
+                        <a href="my-bookings.html" class="btn btn-primary">View My Bookings</a>
+                        <a href="index.html" class="btn btn-secondary">Back to Home</a>
+                    </div>
+                    <div class="note">
+                        <strong>📌 Important:</strong> Arrive 10-15 minutes early. Carry this booking ID.
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFailure(order) {
+            document.getElementById('mainContainer').innerHTML = `
+                <div class="error-state">
+                    <div class="icon" style="background:#ffebee; color:#c62828;">✕</div>
+                    <h2>Payment Failed</h2>
+                    <p style="color:#666;margin-bottom:20px;">
+                        We could not confirm your payment. If money was deducted, it will be refunded automatically.
+                    </p>
+                    <div class="details" style="text-align:left; max-width:400px; margin:0 auto 20px auto; background:#fff; padding:15px; border-radius:8px;">
+                        <div class="detail-row"><span class="label">Order ID</span><span class="value">${order?.orderId || '-'}</span></div>
+                        <div class="detail-row"><span class="label">Amount</span><span class="value">₹${formatNumber(order?.amount)}</span></div>
+                        <div class="detail-row"><span class="label">Status</span><span class="value" style="color:#c62828; font-weight:bold;">${order?.status?.toUpperCase() || 'FAILED'}</span></div>
+                    </div>
+                    <div class="actions">
+                        <a href="package.html" class="btn btn-primary">Try Again</a>
+                        <a href="index.html" class="btn btn-secondary">Go Home</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showError(title, message) {
+            document.getElementById('mainContainer').innerHTML = `
+                <div class="error-state">
+                    <div class="icon">⚠️</div>
+                    <h2>${title}</h2>
+                    <p style="color:#666;margin-bottom:20px;">${message}</p>
+                    <a href="index.html" class="btn btn-primary" style="display:inline-block;padding:12px 30px;">Go Home</a>
+                </div>
+            `;
+        }
+
+        function formatDate(d) { return d ? new Date(d).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '-'; }
+        function formatNumber(n) { return new Intl.NumberFormat('en-IN').format(n || 0); }
+    </script>
+</body>
+
+</html>
