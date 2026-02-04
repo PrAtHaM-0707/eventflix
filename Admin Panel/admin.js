@@ -2,7 +2,7 @@
 // EVENTFLIX ADMIN DASHBOARD - admin.js
 // ====================================================
 
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://eventflix.onrender.com';
 const ITEMS_PER_PAGE = 10;
 
 // Global State

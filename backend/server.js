@@ -74,5 +74,4 @@ process.on('unhandledRejection', (reason, promise) => {
 // Start Server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`Open http://localhost:${PORT} to view the app`);
 });

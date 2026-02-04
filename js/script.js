@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://eventflix.onrender.com';
 
 document.addEventListener('DOMContentLoaded', function () {
     initDatePicker();

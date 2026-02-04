@@ -410,28 +410,28 @@ app.post('/api/auth/send-otp', (req, res) => {
     // ====================================================
     // WHAPI INTEGRATION (Send WhatsApp OTP)
     // ====================================================
-    const WHAPI_TOKEN = process.env.WHAPI_TOKEN;
-    const WHAPI_URL = process.env.WHAPI_URL || 'https://gate.whapi.cloud/messages/text';
+    // const WHAPI_TOKEN = process.env.WHAPI_TOKEN;
+    // const WHAPI_URL = process.env.WHAPI_URL || 'https://gate.whapi.cloud/messages/text';
 
-    if (WHAPI_TOKEN) {
-      try {
-        await axios.post(WHAPI_URL, {
-          to: `91${phoneStr}@s.whatsapp.net`,
-          body: `Your EventFlix verification code is: ${otp}. Do not share this with anyone.`
-        }, {
-          headers: {
-            'Authorization': `Bearer ${WHAPI_TOKEN}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        console.log(`✅ Whapi: OTP sent to ${phoneStr}`);
-      } catch (err) {
-        console.error('❌ Whapi Error:', err?.response?.data || err.message);
-        // Continue execution so we don't block the UI, but log the error
-      }
-    } else {
-      console.log('⚠️ WHAPI_TOKEN not set. OTP not sent via WhatsApp.');
-    }
+    // if (WHAPI_TOKEN) {
+    //   try {
+    //     await axios.post(WHAPI_URL, {
+    //       to: `91${phoneStr}@s.whatsapp.net`,
+    //       body: `Your EventFlix verification code is: ${otp}. Do not share this with anyone.`
+    //     }, {
+    //       headers: {
+    //         'Authorization': `Bearer ${WHAPI_TOKEN}`,
+    //         'Content-Type': 'application/json'
+    //       }
+    //     });
+    //     console.log(`✅ Whapi: OTP sent to ${phoneStr}`);
+    //   } catch (err) {
+    //     console.error('❌ Whapi Error:', err?.response?.data || err.message);
+    //     // Continue execution so we don't block the UI, but log the error
+    //   }
+    // } else {
+    //   console.log('⚠️ WHAPI_TOKEN not set. OTP not sent via WhatsApp.');
+    // }
 
     res.json({
       success: true,
