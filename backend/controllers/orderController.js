@@ -104,7 +104,7 @@ export const createOrder = async (req, res) => {
         logger.error('Create Order Error:', error);
         res.status(500).json({ success: false, message: 'Order creation failed' });
     }
-```,oldString:};
+};
 
 export const verifyOrder = async (req, res) => {
     try {
@@ -136,6 +136,7 @@ export const verifyOrder = async (req, res) => {
         res.json({ success: true, paid: order.status === 'confirmed', order });
 
     } catch (error) {
+        logger.error('Verify Order Error:', error);
         res.status(500).json({ success: false, message: 'Verification Error' });
     }
 };
@@ -189,11 +190,12 @@ export const paymentWebhook = async (req, res) => {
                 order.paidAt = new Date();
                 await order.save();
                 await bookSlotInternal(order.booking.date, order.booking.location, order.booking.slotId, order.booking.package);
-                console.log(`Webhook: Order ${orderId} confirmed`);
+                logger.info(`Webhook: Order ${orderId} confirmed`);
             }
         }
         res.json({ received: true });
     } catch (e) {
+        logger.error('Webhook Error:', e);
         res.json({ received: true });
     }
 };

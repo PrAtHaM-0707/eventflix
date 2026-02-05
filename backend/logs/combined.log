@@ -1,0 +1,8 @@
+{"level":"info","message":"Server running on port 5000","service":"eventflix-backend","timestamp":"2026-02-05 19:27:50"}
+{"level":"info","message":"MongoDB Connected: ac-scubfub-shard-00-00.vklew4x.mongodb.net","service":"eventflix-backend","timestamp":"2026-02-05 19:27:51"}
+{"level":"info","message":"Server running on port 5000","service":"eventflix-backend","timestamp":"2026-02-05 19:28:00"}
+{"level":"info","message":"MongoDB Connected: ac-scubfub-shard-00-00.vklew4x.mongodb.net","service":"eventflix-backend","timestamp":"2026-02-05 19:28:01"}
+{"level":"info","message":"Server running on port 5000","service":"eventflix-backend","timestamp":"2026-02-05 19:28:36"}
+{"level":"info","message":"MongoDB Connected: ac-scubfub-shard-00-00.vklew4x.mongodb.net","service":"eventflix-backend","timestamp":"2026-02-05 19:28:38"}
+{"level":"info","message":"Server running on port 5000","service":"eventflix-backend","timestamp":"2026-02-05 19:29:22"}
+{"level":"info","message":"MongoDB Connected: ac-scubfub-shard-00-00.vklew4x.mongodb.net","service":"eventflix-backend","timestamp":"2026-02-05 19:29:23"}
