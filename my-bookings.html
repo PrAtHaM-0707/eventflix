@@ -10,7 +10,6 @@
 </head>
 
 <body>
-    <!-- Navbar -->
     <nav>
         <div class="logo">
             <a href="index.html"><img src="img/Logo.png" alt="Event Flix"></a>
@@ -26,7 +25,6 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container">
         <div class="page-header">
             <h1>My Bookings</h1>
@@ -34,13 +32,11 @@
         </div>
 
         <div id="mainContent">
-            <!-- Login Section -->
             <div class="login-section" id="loginSection">
                 <div class="icon">📱</div>
                 <h2>View Your Bookings</h2>
                 <p>Enter your phone number to see your bookings</p>
 
-                <!-- Phone Form -->
                 <div id="phoneFormContainer">
                     <div class="form-group">
                         <label for="userPhone">Mobile Number</label>
@@ -53,7 +49,6 @@
                     <button type="button" class="submit-btn" id="sendOtpBtn">View Bookings →</button>
                 </div>
 
-                <!-- OTP Form -->
                 <div id="otpFormContainer" style="display: none;">
                     <p style="margin-bottom: 10px;">Enter OTP sent to <strong id="otpPhone">+91 XXXXXXXXXX</strong></p>
                     <div class="otp-container" id="otpInputsContainer">
@@ -73,7 +68,6 @@
                 </div>
             </div>
 
-            <!-- Bookings Section -->
             <div id="bookingsSection" style="display: none;">
                 <div class="user-info-bar" id="userInfoBar">
                     <div class="user-details">
@@ -95,7 +89,6 @@
         </div>
     </div>
 
-    <!-- Cancel Modal -->
     <div class="modal-overlay" id="cancelModal">
         <div class="modal">
             <div class="modal-header">
@@ -115,23 +108,19 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
         const API_URL = 'https://eventflix.onrender.com';
 
-        // State
         let currentUser = null;
         let currentPhone = '';
         let tempPhone = '';
         let otpTimerInterval = null;
         let cancelOrderId = null;
 
-        // Elements
         const elements = {};
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', function () {
             cacheElements();
             setupEventListeners();
@@ -157,7 +146,6 @@
         }
 
         function setupEventListeners() {
-            // Phone input
             if (elements.userPhone) {
                 elements.userPhone.addEventListener('input', function () {
                     this.value = this.value.replace(/\D/g, '').substring(0, 10);
@@ -167,7 +155,6 @@
                 });
             }
 
-            // Buttons
             if (elements.sendOtpBtn) elements.sendOtpBtn.addEventListener('click', handleSendOTP);
             if (elements.verifyBtn) elements.verifyBtn.addEventListener('click', handleVerifyOTP);
             if (elements.changeNumberBtn) elements.changeNumberBtn.addEventListener('click', showPhoneForm);
@@ -176,7 +163,6 @@
             if (elements.cancelModalClose) elements.cancelModalClose.addEventListener('click', closeCancelModal);
             if (elements.confirmCancelBtn) elements.confirmCancelBtn.addEventListener('click', confirmCancel);
 
-            // OTP inputs
             setupOTPInputs();
         }
 
@@ -212,7 +198,6 @@
             elements.sendOtpBtn.textContent = 'Checking...';
 
             try {
-                // Direct login for now
                 const response = await fetch(`${API_URL}/api/auth/login-direct`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -223,12 +208,11 @@
 
                 if (data.success) {
                     showToast('Welcome back!', 'success');
-                    // Skip OTP, go to bookings
                     currentUser = data.user;
                     currentPhone = phone;
                     updateUserInfo();
                     showBookingsSection();
-                    loadBookings(); // ADDED: Actually load the data
+                    loadBookings(); 
                 } else {
                     showToast(data.message || 'Login failed', 'error');
                 }
@@ -336,7 +320,6 @@
         }
 
         function updateUserInfo() {
-             // Basic view update wrapper
              document.getElementById('userName').textContent = currentUser?.name || 'User';
              document.getElementById('userPhoneDisplay').textContent = '+91 ' + currentPhone; 
         }

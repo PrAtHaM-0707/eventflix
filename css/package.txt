@@ -6,7 +6,6 @@
   --success: #27ae60;
   --danger: #e74c3c;
   --warning: #f39c12;
-  --nav-height: 70px;
 }
 
 * {
@@ -26,7 +25,7 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: var(--nav-height);
+  height: 70px;
   padding: 0 5%;
   background-color: #fff;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -35,59 +34,14 @@ nav {
   z-index: 1000;
 }
 
-nav .logo {
-  display: flex;
-  align-items: center;
-}
-
 nav .logo img {
   width: 150px;
 }
 
-/* Hamburger Button */
-.hamburger {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  width: 44px;
-  height: 44px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 10px;
-  z-index: 1001;
-}
-
-.hamburger span {
-  display: block;
-  width: 24px;
-  height: 3px;
-  background-color: var(--primary);
-  border-radius: 2px;
-  transition: all 0.3s ease;
-  transform-origin: center;
-}
-
-.hamburger.active span:nth-child(1) {
-  transform: rotate(45deg) translate(6px, 6px);
-}
-
-.hamburger.active span:nth-child(2) {
-  opacity: 0;
-}
-
-.hamburger.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(6px, -6px);
-}
-
-/* Nav Links */
 nav ul {
   display: flex;
   list-style: none;
   gap: 2rem;
-  align-items: center;
 }
 
 nav ul li a {
@@ -99,17 +53,6 @@ nav ul li a {
 
 nav ul li a:hover {
   color: var(--cta-color);
-}
-
-/* Mobile Book Item - Hidden on desktop */
-.mobile-book-item {
-  display: none;
-}
-
-/* Book Button */
-nav .book {
-  display: flex;
-  align-items: center;
 }
 
 nav .book .book-btn {
@@ -124,100 +67,6 @@ nav .book .book-btn {
 
 nav .book .book-btn:hover {
   background-color: var(--cta-hover);
-}
-
-/* Mobile Navigation */
-@media (max-width: 768px) {
-  nav {
-    padding: 0 4%;
-  }
-
-  .hamburger {
-    display: flex;
-  }
-
-  .desktop-book {
-    display: none;
-  }
-
-  .mobile-book-item {
-    display: block;
-  }
-
-  nav ul {
-    position: fixed;
-    top: var(--nav-height);
-    left: 0;
-    right: 0;
-    background: #fff;
-    flex-direction: column;
-    gap: 0;
-    padding: 0;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-  }
-
-  nav ul.active {
-    max-height: 350px;
-  }
-
-  nav ul li {
-    width: 100%;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-  }
-
-  nav ul li:last-child {
-    border-bottom: none;
-  }
-
-  nav ul li a {
-    display: block;
-    padding: 1rem;
-    width: 100%;
-  }
-
-  .mobile-book-item {
-    padding: 1rem;
-    width: 100%;
-  }
-
-  .mobile-book-item .book-btn {
-    display: block;
-    width: 100%;
-    text-align: center;
-    padding: 0.8rem 1.2rem;
-    background-color: var(--cta-color);
-    color: #fff;
-    border-radius: 50px;
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .mobile-book-item .book-btn:hover {
-    background-color: var(--cta-hover);
-  }
-}
-
-@media (max-width: 480px) {
-  nav {
-    padding: 0 3%;
-  }
-
-  nav .logo img {
-    width: 120px;
-  }
-
-  .hamburger {
-    width: 40px;
-    height: 40px;
-  }
-
-  .hamburger span {
-    width: 22px;
-  }
 }
 
 /* Location Banner */
@@ -461,7 +310,7 @@ nav .book .book-btn:hover {
 
 .features-list li:last-child {
   border-bottom: none;
-}
+    }
 
 .features-list li::before {
   content: "✓";
@@ -916,6 +765,19 @@ nav .book .book-btn:hover {
 
 /* Responsive */
 @media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    height: auto;
+    padding: 15px 5%;
+  }
+
+  nav ul {
+    margin-top: 15px;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   .booking-info-bar {
     flex-direction: column;
     align-items: center;

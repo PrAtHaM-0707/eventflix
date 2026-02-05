@@ -4,12 +4,13 @@ import { PACKAGES, TIME_SLOTS } from '../data/constants.js';
 import { generateOrderId, getSlotKey } from '../utils/helpers.js';
 import { bookSlotInternal, freeSlotInternal } from './slotController.js';
 import axios from 'axios';
+import logger from '../utils/logger.js';
 
 // Cashfree config
 const getCashfreeConfig = () => ({
     APP_ID: process.env.CASHFREE_APP_ID,
     SECRET_KEY: process.env.CASHFREE_SECRET_KEY,
-    BASE_URL: (process.env.CASHFREE_ENV || 'sandbox') === 'production' 
+    BASE_URL: process.env.CASHFREE_ENV === 'production' 
         ? 'https://api.cashfree.com/pg' 
         : 'https://sandbox.cashfree.com/pg',
     HEADERS: {
@@ -51,6 +52,11 @@ export const createOrder = async (req, res) => {
 
         if (config.APP_ID) {
             try {
+                // Use FRONTEND_URL from env, strictly no hardcoded fallback that exposes localhost in logic
+                const returnUrl = process.env.FRONTEND_URL 
+                    ? `${process.env.FRONTEND_URL}/booking-success.html?order_id=${orderId}`
+                    : `http://localhost:5000/booking-success.html?order_id=${orderId}`; // Default to local backend/static serve
+
                 const cfRes = await axios.post(`${config.BASE_URL}/orders`, {
                     order_id: orderId,
                     order_amount: amount,
@@ -61,13 +67,13 @@ export const createOrder = async (req, res) => {
                         customer_phone: String(customer.phone)
                     },
                     order_meta: {
-                        return_url: `${process.env.FRONTEND_URL || 'http://127.0.0.1:5500'}/booking-success.html?order_id=${orderId}`
+                        return_url: returnUrl
                     }
                 }, { headers: config.HEADERS });
                 paymentSessionId = cfRes.data.payment_session_id;
                 cfOrderId = cfRes.data.cf_order_id;
             } catch (e) {
-                console.log('Cashfree Error, using demo mode');
+                logger.error('Cashfree Error, using demo mode', e?.response?.data || e.message);
             }
         }
 
@@ -95,10 +101,10 @@ export const createOrder = async (req, res) => {
         res.json({ success: true, orderId, amount, paymentSessionId, order });
 
     } catch (error) {
-        console.error('Create Order Error:', error);
+        logger.error('Create Order Error:', error);
         res.status(500).json({ success: false, message: 'Order creation failed' });
     }
-};
+```,oldString:};
 
 export const verifyOrder = async (req, res) => {
     try {

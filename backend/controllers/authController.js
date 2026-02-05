@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import { generateOTP, generateToken } from '../utils/helpers.js';
 import axios from 'axios';
+import logger from '../utils/logger.js';
 
 // In-Memory OTP Store
 export const otpStore = new Map();
@@ -42,9 +43,10 @@ export const sendOTP = async (req, res) => {
       createdAt: new Date().toISOString()
     });
 
+    // Only log OTP in dev mode
     if (process.env.NODE_ENV !== 'production') {
-  console.log(`OTP for ${phoneStr}: ${otp}`);
-}
+       logger.debug(`OTP for ${phoneStr}: ${otp}`);
+    }
 
     // Whapi Integration
     const WHAPI_TOKEN = process.env.WHAPI_TOKEN;
@@ -61,12 +63,12 @@ export const sendOTP = async (req, res) => {
             'Content-Type': 'application/json' 
           }
         });
-        console.log(`✅ Whapi: OTP sent to ${phoneStr}`);
+        logger.info(`Whapi: OTP sent to ${phoneStr}`);
       } catch (err) {
-        console.error('❌ Whapi Error:', err?.response?.data || err.message);
+        logger.error('Whapi Error:', err?.response?.data || err.message);
       }
     } else {
-      console.log('⚠️ WHAPI_TOKEN missing. Using Demo Mode.');
+      logger.warn('WHAPI_TOKEN missing. Using Demo Mode.');
     }
 
     res.json({
@@ -77,7 +79,7 @@ export const sendOTP = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Send OTP Error:', error);
+    logger.error('Send OTP Error:', error);
     res.status(500).json({ success: false, message: 'Failed to send OTP' });
   }
 };

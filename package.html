@@ -6,13 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EventFlix - Choose Your Package</title>
   <link rel="shortcut icon" href="img/Logo.png" type="image/png">
-  <!-- Cashfree SDK -->
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <link rel="stylesheet" href="css/package.css">
 </head>
 
 <body>
-  <!-- Navbar -->
   <nav>
     <div class="logo">
       <a href="index.html"><img src="img/Logo.png" alt="Event Flix"></a>
@@ -28,12 +26,10 @@
     </div>
   </nav>
 
-  <!-- Payment Mode Banner -->
   <div class="payment-mode-banner" id="paymentModeBanner">
     ⚠️ Demo Mode: Payments will be simulated (Cashfree not configured)
   </div>
 
-  <!-- Location Banner -->
   <div class="location-banner">
     <h2>
       EVENT FLIX <span id="locationName">-</span>
@@ -41,7 +37,6 @@
     </h2>
   </div>
 
-  <!-- Booking Info Bar -->
   <div class="booking-info-bar">
     <div class="booking-info-item">
       <span class="icon">📍</span>
@@ -66,7 +61,6 @@
     </div>
   </div>
 
-  <!-- Main Content -->
   <div class="container">
     <div class="page-header">
       <h1>Choose Your Package</h1>
@@ -89,7 +83,6 @@
     </div>
   </div>
 
-  <!-- Login Modal -->
   <div class="modal-overlay" id="loginModal">
     <div class="modal">
       <button type="button" class="modal-close" onclick="window.closeModal()">&times;</button>
@@ -107,7 +100,6 @@
           <p class="total">Total: ₹<span id="summaryAmount">0</span></p>
         </div>
 
-        <!-- Phone step -->
         <div id="phoneFormContainer">
           <div class="form-group">
             <label for="userName">Your Name</label>
@@ -124,7 +116,6 @@
           <button type="button" class="submit-btn" id="sendOtpBtn">Send OTP →</button>
         </div>
 
-        <!-- OTP step -->
         <div id="otpFormContainer" style="display: none;">
           <p style="text-align:center;margin-bottom:10px;">
             Enter OTP sent to <strong id="otpPhone">+91 XXXXXXXXXX</strong>
@@ -148,7 +139,6 @@
     </div>
   </div>
 
-  <!-- Processing Modal -->
   <div class="modal-overlay" id="processingModal">
     <div class="processing-content">
       <div class="spinner"></div>
@@ -157,22 +147,16 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
-    // ====================================================
-    // CONFIGURATION
-    // ====================================================
-    const API_URL = 'https://eventflix.onrender.com';
+   const API_URL = 'https://eventflix.onrender.com';
 
-    // Initialize Cashfree SDK
     let cashfree = null;
     let cashfreeReady = false;
 
     function initCashfree() {
       try {
-        // Try sandbox mode first
         cashfree = Cashfree({ mode: "sandbox" });
         cashfreeReady = true;
         console.log('✅ Cashfree SDK initialized (Sandbox Mode)');
@@ -184,9 +168,6 @@
       }
     }
 
-    // ====================================================
-    // STATE VARIABLES
-    // ====================================================
     let selectedLocation = '';
     let selectedDate = '';
     let selectedPackage = null;
@@ -195,13 +176,10 @@
     let bookedSlots = [];
     let otpTimerInterval = null;
     let tempUser = { name: '', phone: '' };
-    let isPaymentMode = 'demo'; // 'demo' or 'live'
+    let isPaymentMode = 'demo'; 
 
     const els = {};
 
-    // ====================================================
-    // INITIALIZATION
-    // ====================================================
     document.addEventListener('DOMContentLoaded', () => {
       cacheEls();
       initCashfree();
@@ -337,9 +315,6 @@
       });
     }
 
-    // ====================================================
-    // DATA LOADING
-    // ====================================================
     async function loadData() {
       try {
         await loadPackages();
@@ -356,12 +331,9 @@
         const res = await fetch(`${API_URL}/health`);
         const data = await res.json();
 
-        // Check if server has Cashfree configured
         const testOrder = await fetch(`${API_URL}/api/packages/${encodeURIComponent(selectedLocation)}`);
         const testData = await testOrder.json();
 
-        // We'll determine mode based on first order attempt
-        // For now, show demo mode if Cashfree SDK isn't ready
         if (!cashfreeReady) {
           isPaymentMode = 'demo';
           els.paymentModeBanner.innerHTML = '⚠️ Demo Mode: Payments will be simulated';
@@ -399,18 +371,15 @@
         }
         const data = await res.json();
         
-        // Handle new per-package availability format
         if (data.success && data.bookedMap) {
-          bookedSlots = data.bookedMap; // Object { Silver: [], Gold: [] }
+          bookedSlots = data.bookedMap;
         } else if (data.success && data.slots) {
-           // Fallback for old format
            const globalList = data.slots.filter(s => s.booked).map(s => s.id);
            bookedSlots = { 'Global': globalList };
         } else {
           bookedSlots = {};
         }
         
-        // Handle global blocks
         if (data.globalBookings && Array.isArray(data.globalBookings)) {
            bookedSlots['Global'] = data.globalBookings;
         }
@@ -489,7 +458,6 @@
         { id: 'slot-6', label: '9 PM - 11 PM' }
       ];
       
-      // Check package specific bookings + global bookings
       const pkgBooked = bookedSlots[pkgName] || [];
       const globalBooked = bookedSlots['Global'] || [];
       const allBooked = [...pkgBooked, ...globalBooked];
@@ -503,9 +471,6 @@
       }).join('');
     }
 
-    // ====================================================
-    // SLOT SELECTION
-    // ====================================================
     window.selectSlot = function (el, pkgName, slotId, slotLabel) {
       document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
       document.querySelectorAll('.book-package-btn').forEach(b => {
@@ -548,9 +513,6 @@
       setTimeout(() => els.userName.focus(), 200);
     };
 
-    // ====================================================
-    // OTP HANDLING
-    // ====================================================
     async function handleSendOTP() {
       const name = els.userName.value.trim();
       const phone = els.userPhone.value.trim();
@@ -576,7 +538,6 @@
       els.sendOtpBtn.textContent = 'Processing...';
 
       try {
-        // Direct Login (No OTP for now)
         const res = await fetch(`${API_URL}/api/auth/login-direct`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -591,7 +552,6 @@
         const data = await res.json();
         if (data.success) {
           showToast('Booking details saved!', 'success');
-          // Skip OTP, proceed directly
           await proceedToPayment(data.user);
         } else {
           showToast(data.message || 'Login failed', 'error');
@@ -727,15 +687,11 @@
       }
     }
 
-    // ====================================================
-    // PAYMENT PROCESSING
-    // ====================================================
     async function proceedToPayment(user) {
       window.closeModal();
       showProcessingModal('Creating Order...', 'Please wait while we prepare your booking');
 
       try {
-        // Step 1: Check slot availability again
         console.log('📋 Checking slot availability...');
         const checkRes = await fetch(`${API_URL}/api/slots/check?date=${encodeURIComponent(selectedDate)}&location=${encodeURIComponent(selectedLocation)}&slotId=${encodeURIComponent(selectedSlot.id)}&package=${encodeURIComponent(selectedPackage.name)}`);
 
@@ -753,7 +709,6 @@
           return;
         }
 
-        // Step 2: Create order
         console.log('💳 Creating order...');
         showProcessingModal('Processing Payment...', 'Connecting to payment gateway');
 
@@ -787,9 +742,7 @@
           throw new Error(orderData.message || 'Order creation failed');
         }
 
-        // Step 3: Process payment
         if (orderData.paymentSessionId && cashfree && cashfreeReady) {
-          // Live Cashfree Payment
           console.log('🔄 Redirecting to Cashfree...');
           showProcessingModal('Redirecting to Payment...', 'You will be redirected to the payment page');
 
@@ -799,7 +752,6 @@
               redirectTarget: "_self"
             });
 
-            // This code runs only if redirect fails
             if (checkoutResult.error) {
               console.error('Cashfree checkout error:', checkoutResult.error);
               hideProcessingModal();
@@ -809,11 +761,9 @@
             console.error('Cashfree checkout exception:', cfError);
             hideProcessingModal();
             showToast('Payment gateway error. Using demo mode.', 'warning');
-            // Fall back to demo mode
             await simulatePayment(orderData.orderId);
           }
         } else {
-          // Demo mode - simulate payment
           console.log('🎮 Demo mode: Simulating payment...');
           await simulatePayment(orderData.orderId);
         }
@@ -829,7 +779,6 @@
       showProcessingModal('Simulating Payment...', 'Demo mode - no actual payment');
 
       try {
-        // Simulate payment delay
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         console.log('✅ Verifying payment for order:', orderId);
@@ -861,9 +810,6 @@
       }
     }
 
-    // ====================================================
-    // UI HELPERS
-    // ====================================================
     function showProcessingModal(title, text) {
       els.processingTitle.textContent = title || 'Processing...';
       els.processingText.textContent = text || 'Please wait';

@@ -5,6 +5,7 @@ import { PACKAGES } from '../data/constants.js';
 import { generateToken } from '../utils/helpers.js';
 import { bookSlotInternal, freeSlotInternal } from './slotController.js';
 import { otpStore } from './authController.js';
+import logger from '../utils/logger.js';
 
 export const loginAdmin = (req, res) => {
     const { username, password } = req.body;
@@ -118,7 +119,7 @@ export const updateOrderStatus = async (req, res) => {
         await order.save();
         res.json({ success: true, order });
     } catch (e) {
-        console.error(e);
-        res.status(500).json({ success: false, message: e.message });
+        logger.error(e);
+        res.status(500).json({ success: false, message: 'Failed to update order status' });
     }
 };
